@@ -31,7 +31,7 @@ try {
 
     $cover = Get-Item -LiteralPath (Join-Path $repoRoot 'media/workshop-cover.png')
     $previews = @(Get-ChildItem -LiteralPath (Join-Path $repoRoot 'media/workshop-previews') -File | Sort-Object Name)
-    if ($previews.Count -ne 3) { throw 'Expected combat, reward, and shop preview GIFs.' }
+    if ($previews.Count -ne 5) { throw 'Expected three gameplay GIFs and two settings screenshots.' }
     foreach ($file in @($cover) + $previews) {
         if ($file.Length -eq 0 -or $file.Length -ge 1000000) { throw "Workshop image must be nonempty and smaller than 1 MB: $($file.Name)" }
     }

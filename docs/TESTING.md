@@ -31,7 +31,7 @@ GitHub Actions builds the managed DLL on one Ubuntu runner using a pinned, locke
 
 The 18 runtime patch-contract checks require actual installed game assemblies and remain part of the installed-game build. Reference-only CI reports this distinction explicitly. The cloud job does not start the game. See [build and release](BUILD.md) for commands and artifact details.
 
-The Workshop script's dry run verifies the package again and stages the metadata, flat install payload, cover, and three ordered GIFs. Compact previews and the cover are checked against the uploader's 1 MB limit. The actual Steam submission remains untested until the first upload; dry runs never contact Steam.
+The Workshop script's dry run verifies the package again and stages the bilingual metadata, flat install payload, cover, three ordered GIFs, and English/Chinese settings screenshots. All previews and the cover are checked against the uploader's 1 MB limit. The actual Steam submission remains untested until the first upload; dry runs never contact Steam.
 
 ## Historical runtime evidence
 

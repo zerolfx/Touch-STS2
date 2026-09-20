@@ -33,7 +33,7 @@ The job:
 3. Creates the versioned installation ZIP.
 4. Inspects the ZIP and its managed DLL without executing the mod.
 5. Checks that deliberately malformed packages are rejected.
-6. Stages the Workshop description, cover, and three GIFs in dry-run mode without contacting Steam.
+6. Stages the bilingual Workshop description, cover, three GIFs, and two settings screenshots in dry-run mode without contacting Steam.
 7. Uploads the verified ZIP, its SHA-256 checksum, and a JSON verification report for 14 days.
 
 Download artifacts from the workflow run's summary. The outer Actions download contains the versioned installation ZIP and its two verification files. The installation ZIP contains only the mod DLL, matching manifest, and player guide inside a single mod folder.
@@ -79,17 +79,17 @@ Repository assets:
 | File | Purpose |
 |---|---|
 | [workshop.json](../workshop/workshop.json) | Title, tags, and required-item metadata |
-| [description.bbcode](../workshop/description.bbcode) | Workshop description |
+| [description.bbcode](../workshop/description.bbcode) | Matching English and Chinese descriptions, with source and issue links |
 | [workshop-cover.png](../media/workshop-cover.png) | Generated tablet and handheld touchscreen illustration |
-| [workshop-previews](../media/workshop-previews) | Combat first, card rewards second, shop confirmation last |
+| [workshop-previews](../media/workshop-previews) | Combat, card rewards, shop confirmation, English settings, then Chinese settings |
 | [media](../media) | Larger GIFs for the project overview |
 
-The cover and compact GIFs are each smaller than 1 MB, matching the [official uploader requirements](https://github.com/megacrit/sts2-mod-uploader/blob/main/template/README.md). The script stages the exact verified DLL, manifest, and guide directly under `content`; presentation assets stay outside the installed payload. The uploader reconciles additional previews by filename, so the three repository GIFs replace any other additional previews on the item. The original STS1 cursor asset's attribution remains documented with that asset.
+The cover, compact GIFs, and settings screenshots are each smaller than 1 MB, matching the [official uploader requirements](https://github.com/megacrit/sts2-mod-uploader/blob/main/template/README.md). The script stages the exact verified DLL, manifest, and guide directly under `content`; presentation assets stay outside the installed payload. The uploader reconciles additional previews by filename, so the five repository previews replace any other additional previews on the item. The original STS1 cursor asset's attribution remains documented with that asset.
 
 Upload workspaces and logs remain under the ignored build-output directory. Neither the local dry run nor GitHub Actions publishes anything. Workshop branch compatibility is managed on the item page as recommended by the official template.
 
 ## Repository conventions
 
-Use English for source comments, documentation, test descriptions, and commit messages. Non-English strings belong in the localization resource or localization test fixtures. Keep exact translated expectations in those fixtures instead of hiding them as Unicode escapes in general-purpose source files.
+Use English for source comments, documentation, test descriptions, and commit messages. Non-English strings belong in localization resources or localization test fixtures; the Workshop title and bilingual description are also localized publication content. Keep exact translated expectations in those fixtures instead of hiding them as Unicode escapes in general-purpose source files.
 
 Keep the README focused on the project overview. Record release changes in [CHANGELOG.md](../CHANGELOG.md). The technical documentation consists of the [player guide](PLAYTEST.md), this build guide, [architecture](ARCHITECTURE.md), [STS1 reference](STS1_REFERENCE.md), and [testing](TESTING.md).

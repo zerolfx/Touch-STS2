@@ -2,6 +2,11 @@
 
 Release notes describe implementation changes. Offline checks and in-game validation are recorded separately in the [test report](docs/TESTING.md).
 
+## Unreleased
+
+- Add English and Chinese settings screenshots to the Workshop gallery after the gameplay demonstrations.
+- Localize the Workshop title and description, document intended touch devices and remote play, and link the public GitHub repository and issue tracker.
+
 ## 0.2.5 - 2026-09-20
 
 - Keep input-setting labels at the native 28-point size and align their tickboxes with the game's settings layout.
