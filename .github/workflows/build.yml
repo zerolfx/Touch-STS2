@@ -40,6 +40,10 @@ jobs:
         run: |
           $version = (Get-Content TouchSts2.json -Raw | ConvertFrom-Json).version
           ./scripts/test-package-validation.ps1 -PackagePath "dist/TouchSts2-$version.zip"
+      - name: Validate Workshop metadata and stage previews without uploading
+        run: |
+          $version = (Get-Content TouchSts2.json -Raw | ConvertFrom-Json).version
+          ./scripts/upload-workshop.ps1 -DryRun -PackagePath "dist/TouchSts2-$version.zip"
       - name: Publish verified build artifacts
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:

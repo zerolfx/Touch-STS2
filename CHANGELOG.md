@@ -2,7 +2,13 @@
 
 Release notes describe implementation changes. Offline checks and in-game validation are recorded separately in the [test report](docs/TESTING.md).
 
-## Unreleased
+## 0.2.5 - 2026-09-20
+
+- Keep input-setting labels at the native 28-point size and align their tickboxes with the game's settings layout.
+- Register optional BaseLib and ModConfig settings, sharing saved preferences and localized labels across all three entry points.
+- Add offline checks for settings synchronization, defaults, and optional plugin adapters.
+- Add combat, reward, and shop demonstration GIFs, plus a touchscreen cover illustration.
+- Add a local Workshop upload script with verified packaging, pinned uploader download, preview mode, and persistent item IDs.
 
 - Add a GitHub Actions build for pushes, pull requests, tags, and manual runs.
 - Pin the CI reference-assembly dependency and verify packaged files, versions, embedded resources, and SHA-256 checksums.

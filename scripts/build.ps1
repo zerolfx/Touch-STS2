@@ -48,7 +48,7 @@ if ($Package) {
     }
     $packagePath = Join-Path $repoRoot "dist/TouchSts2-$version.zip"
     Compress-Archive -Path $output -DestinationPath $packagePath -Force
-    & dotnet run --project (Join-Path $repoRoot 'tests/TouchSts2.PackageChecks/TouchSts2.PackageChecks.csproj') -c Release -- $packagePath (Join-Path $repoRoot 'TouchSts2.json') (Join-Path $repoRoot 'src/TouchSts2/Localization/strings.json')
+    & dotnet run --project (Join-Path $repoRoot 'tests/TouchSts2.PackageChecks/TouchSts2.PackageChecks.csproj') -c Release "-p:RestoreConfigFile=$restoreConfig" -- $packagePath (Join-Path $repoRoot 'TouchSts2.json') (Join-Path $repoRoot 'src/TouchSts2/Localization/strings.json')
     if ($LASTEXITCODE -ne 0) { throw 'Package verification failed.' }
     Write-Host "Package: $packagePath"
 }

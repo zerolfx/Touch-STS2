@@ -29,11 +29,12 @@ The **Build and verify** workflow runs on pushes to `main`, `v*` tags, pull requ
 The job:
 
 1. Compiles the mod using the locked reference dependency.
-2. Runs 417 gesture, 102 localization, and 28 cursor checks.
+2. Runs 417 gesture, 102 localization, 28 cursor, and 67 settings adapter checks.
 3. Creates the versioned installation ZIP.
 4. Inspects the ZIP and its managed DLL without executing the mod.
 5. Checks that deliberately malformed packages are rejected.
-6. Uploads the verified ZIP, its SHA-256 checksum, and a JSON verification report for 14 days.
+6. Stages the Workshop description, cover, and three GIFs in dry-run mode without contacting Steam.
+7. Uploads the verified ZIP, its SHA-256 checksum, and a JSON verification report for 14 days.
 
 Download artifacts from the workflow run's summary. The outer Actions download contains the versioned installation ZIP and its two verification files. The installation ZIP contains only the mod DLL, matching manifest, and player guide inside a single mod folder.
 
@@ -51,20 +52,41 @@ Reference-only CI cannot execute the game's patch-contract reflection checks. Be
 
 ## Steam Workshop release
 
-Use Mega Crit's [official mod uploader](https://github.com/megacrit/sts2-mod-uploader). Its [workspace template guide](https://github.com/megacrit/sts2-mod-uploader/blob/main/template/README.md) documents the metadata fields and image limits.
+Use [upload-workshop.ps1](../scripts/upload-workshop.ps1) from PowerShell 7.2 or newer. Uploading requires Windows x64, the SDK above, and Steam running under the publishing account. The script downloads Mega Crit's [official uploader v0.2.0](https://github.com/megacrit/sts2-mod-uploader/releases/tag/v0.2.0), verifies its pinned SHA-256, and reuses the Steam client session. No runner or stored Steam password is needed.
 
-Before the first public release:
+Build, validate, and inspect a staged workspace without uploading:
 
-- Choose the release version and keep the project, mod manifest, release tag, and changelog consistent.
-- Run the installed-game contract checks and the key manual scenarios, including the latest confirmation UI and cursor changes. Keep untested hardware and co-op limitations explicit.
-- Prepare the Workshop title, description, tags, visibility, and change note. The current mod has no required mod dependencies. Keep the input-settings activation instructions and modded-save behavior in the description.
-- Create the required `image.png` cover, smaller than 1 MB. Optional additional preview images must also meet the uploader's size limit.
-- Retain attribution for the included STS1 cursor asset. Its provenance is documented with the asset; it is not original project artwork.
-- Sign into Steam with the publishing account and accept Steam's Workshop agreement if requested.
+```powershell
+./scripts/upload-workshop.ps1 -DryRun
+```
 
-Run the uploader once to create a workspace. Put the verified mod payload in its `content` folder, fill out `workshop.json`, and replace the template cover. Start with private visibility to test subscription installation before making the item public. Upload with the uploader's `upload -w` command. Preserve the generated `mod_id.txt`; subsequent uploads use it to update the same item rather than creating another one.
+Create the Workshop item with private visibility:
 
-The Workshop metadata is separate from the game's `TouchSts2.json` manifest. The official template notes inconsistent behavior for its branch metadata fields and recommends editing those on the Workshop page. No Workshop item is created by this repository's build workflow.
+```powershell
+./scripts/upload-workshop.ps1 -Create
+```
+
+The successful upload saves the ID in `workshop/mod_id.txt`. Keep this file so the ordinary command updates the same item:
+
+```powershell
+./scripts/upload-workshop.ps1 -ChangeNote 'Improve touchscreen settings'
+```
+
+Use `-ItemId` to adopt an existing item, `-Visibility public` to publish it, or `-PackagePath` to upload an already verified ZIP instead of rebuilding. Updates preserve visibility unless explicitly changed. If a creation fails after Steam has allocated an item, check the uploader log for that ID and retry with `-ItemId`; do not create a duplicate. Steam may require acceptance of the Workshop agreement before an item becomes visible.
+
+Repository assets:
+
+| File | Purpose |
+|---|---|
+| [workshop.json](../workshop/workshop.json) | Title, tags, and required-item metadata |
+| [description.bbcode](../workshop/description.bbcode) | Workshop description |
+| [workshop-cover.png](../media/workshop-cover.png) | Generated tablet and handheld touchscreen illustration |
+| [workshop-previews](../media/workshop-previews) | Combat first, card rewards second, shop confirmation last |
+| [media](../media) | Larger GIFs for the project overview |
+
+The cover and compact GIFs are each smaller than 1 MB, matching the [official uploader requirements](https://github.com/megacrit/sts2-mod-uploader/blob/main/template/README.md). The script stages the exact verified DLL, manifest, and guide directly under `content`; presentation assets stay outside the installed payload. The uploader reconciles additional previews by filename, so the three repository GIFs replace any other additional previews on the item. The original STS1 cursor asset's attribution remains documented with that asset.
+
+Upload workspaces and logs remain under the ignored build-output directory. Neither the local dry run nor GitHub Actions publishes anything. Workshop branch compatibility is managed on the item page as recommended by the official template.
 
 ## Repository conventions
 

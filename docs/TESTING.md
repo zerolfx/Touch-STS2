@@ -8,13 +8,15 @@ The recorded game baseline is Windows STS2 v0.111.0, MegaDot 4.5.1-m.14, and .NE
 
 ## Current offline checks
 
-Version 0.2.4 builds in Release with zero warnings and zero errors. The checks cover:
+Version 0.2.5 builds in Release with zero warnings and zero errors. The checks cover:
 
 | Group | Coverage |
 |---|---|
 | 417 gesture checks | Four viewport sizes; release policy, cancellation, card switching, positioning, drag/hold arbitration, and legal-target inputs outside the ordinary play area |
 | 102 localization checks | All 16 game languages, nonempty labels, exact locale fixtures, case handling, and fallback |
 | 28 cursor checks | Initial opacity, rotation, pointer following, repeated presses, held fade, release, cleanup, and snap timing at 30/60/144 Hz |
+| 67 settings adapter checks | Registration, all translated labels, preserved preferences, real defaults, two-way synchronization, redundant-write suppression, and BaseLib callback dispatch |
+| Optional plugin contracts | Installed BaseLib 3.4.7 and ModConfig 0.2.3 public APIs resolve; the BaseLib adapter type can be generated without starting the engine |
 | Cursor resource | Embedded texture matches the STS1 PC SHA-256 |
 | 18 patch targets | Actual game method signatures and associated mouse, position, scroll, target, and reward-preview contracts resolve |
 | Embedded localization | Release DLL contains all 16 language tables |
@@ -29,7 +31,13 @@ GitHub Actions builds the managed DLL on one Ubuntu runner using a pinned, locke
 
 The 18 runtime patch-contract checks require actual installed game assemblies and remain part of the installed-game build. Reference-only CI reports this distinction explicitly. The cloud job does not start the game. See [build and release](BUILD.md) for commands and artifact details.
 
+The Workshop script's dry run verifies the package again and stages the metadata, flat install payload, cover, and three ordered GIFs. Compact previews and the cover are checked against the uploader's 1 MB limit. The actual Steam submission remains untested until the first upload; dry runs never contact Steam.
+
 ## Historical runtime evidence
+
+### User acceptance, September 20, 2026
+
+The user reported completed in-game acceptance and supplied recordings of combat card play, card reward selection, and shop confirmation. Edited demonstrations are included in the project overview. The input hardware and multiplayer coverage were not specified. The separately reported small settings text and missing plugin entries prompted 0.2.5; those settings changes have not been visually retested in-game.
 
 ### 0.1.0
 
