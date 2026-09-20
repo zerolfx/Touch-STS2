@@ -24,9 +24,9 @@ The script does not start the game or install the mod. There are no additional r
 
 ## GitHub Actions
 
-The **Build and verify** workflow runs on pushes to `main`, `v*` tags, pull requests, and manual dispatch. Separate Windows and Linux jobs use GitHub-hosted runners. Both use the same reference-build command, with pinned action commits, a read-only repository token, and no secrets.
+The **Build and verify** workflow runs on pushes to `main`, `v*` tags, pull requests, and manual dispatch. One GitHub-hosted Ubuntu runner builds the platform-independent managed DLL using the reference-build command, with pinned action commits, a read-only repository token, and no secrets. Compiling on multiple runner operating systems would not establish additional in-game compatibility.
 
-Each job:
+The job:
 
 1. Compiles the mod using the locked reference dependency.
 2. Runs 417 gesture, 102 localization, and 28 cursor checks.
