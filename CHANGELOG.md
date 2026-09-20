@@ -4,6 +4,9 @@ Release notes describe implementation changes. Offline checks and in-game valida
 
 ## Unreleased
 
+- Add GitHub Actions builds on Windows and Linux for pushes, pull requests, tags, and manual runs.
+- Pin the CI reference-assembly dependency and verify packaged files, versions, embedded resources, and SHA-256 checksums.
+- Include the original 845-byte STS1 cursor texture so builds no longer need an STS1 installation or CI secrets.
 - Rewrite project documentation in English and keep localized text in i18n resources and fixtures.
 - Separate the project overview, build instructions, and release history.
 - Organize the initial repository history by implementation and documentation.

@@ -50,7 +50,7 @@ Touch-STS2 retains native STS2 hitboxes rather than replacing the hand's full ge
 
 ## Touch cursor
 
-`GameCursor` normally draws the gold pointer. In its touchscreen branch it uses `ImageMaster.WOBBLY_ORB_VFX`, loaded from the `orb.png` asset. The original source image is extracted during the build without redrawing it.
+`GameCursor` normally draws the gold pointer. In its touchscreen branch it uses `ImageMaster.WOBBLY_ORB_VFX`, loaded from the `orb.png` asset. The original 845-byte image is included unchanged and embedded during the build.
 
 | Property | Reference |
 |---|---|

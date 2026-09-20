@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net9.0": {
+      "Book.StS2.RefLib": {
+        "type": "Direct",
+        "requested": "[0.111.0-beta, 0.111.0-beta]",
+        "resolved": "0.111.0-beta",
+        "contentHash": "T8YH3F8wJj/3rPfcf/tQhqRxP/nSpXgqk00MENztnR64Oq2vi29/rlyEMVvo7e06BRcvNKTgk/EySzUCZYdsVw=="
+      }
+    }
+  }
+}

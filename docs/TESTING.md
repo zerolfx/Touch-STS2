@@ -23,6 +23,12 @@ The co-op policy tests receive target validity as an input. They do not prove re
 
 The cursor tests establish resource identity and fade-state behavior. They do not establish cross-engine pixel equivalence or identical visibility in every STS1 state; see [the STS1 reference](STS1_REFERENCE.md).
 
+## Continuous integration
+
+GitHub Actions builds on Windows and Linux using a pinned, locked compile-only reference package. Both jobs run the pure checks and inspect the final ZIP's allowlist, manifest, assembly identity/version, embedded translations, and cursor hash. Six malformed-package fixtures verify rejection of unexpected payloads and missing or changed files. Each successful build uploads the installation ZIP, a checksum, and a per-file verification report.
+
+The 18 runtime patch-contract checks require actual installed game assemblies and remain part of the installed-game build. Reference-only CI reports this distinction explicitly. Neither cloud job starts the game. See [build and release](BUILD.md) for commands and artifact details.
+
 ## Historical runtime evidence
 
 ### 0.1.0

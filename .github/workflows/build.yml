@@ -1,0 +1,56 @@
+name: Build and verify
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: 'true'
+  DOTNET_CLI_TELEMETRY_OPTOUT: 'true'
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 'true'
+
+jobs:
+  package:
+    name: Build and verify (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+      - name: Build with pinned references, test, and verify the ZIP
+        run: ./scripts/build.ps1 -ReferenceAssemblies -Package
+      - name: Verify that malformed packages are rejected
+        run: |
+          $version = (Get-Content TouchSts2.json -Raw | ConvertFrom-Json).version
+          ./scripts/test-package-validation.ps1 -PackagePath "dist/TouchSts2-$version.zip"
+      - name: Publish verified build artifacts
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: TouchSts2-${{ matrix.os }}-${{ github.sha }}
+          path: |
+            dist/TouchSts2-*.zip
+            dist/TouchSts2-*.zip.sha256
+            dist/TouchSts2-*.zip.verification.json
+          if-no-files-found: error
+          retention-days: 14

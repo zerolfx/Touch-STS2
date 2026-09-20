@@ -8,16 +8,19 @@
     <Version>0.2.4</Version>
     <GameDir Condition="'$(GameDir)' == ''">C:/Program Files (x86)/Steam/steamapps/common/Slay the Spire 2</GameDir>
     <GameDataDir Condition="'$(GameDataDir)' == ''">$(GameDir)/data_sts2_windows_x86_64</GameDataDir>
+    <RestorePackagesWithLockFile Condition="'$(UseReferenceAssemblies)' == 'true'">true</RestorePackagesWithLockFile>
+    <NuGetLockFilePath Condition="'$(UseReferenceAssemblies)' == 'true'">packages.ci.lock.json</NuGetLockFilePath>
   </PropertyGroup>
   <ItemGroup>
-    <EmbeddedResource Include="../../research/sts1/orb.png" LogicalName="TouchSts2.sts1.orb.png" />
+    <EmbeddedResource Include="Assets/touch-cursor.png" LogicalName="TouchSts2.sts1.orb.png" />
     <EmbeddedResource Include="Localization/strings.json" LogicalName="TouchSts2.Localization.strings.json" />
-    <Reference Include="sts2"><HintPath>$(GameDataDir)/sts2.dll</HintPath><Private>false</Private></Reference>
-    <Reference Include="GodotSharp"><HintPath>$(GameDataDir)/GodotSharp.dll</HintPath><Private>false</Private></Reference>
-    <Reference Include="0Harmony"><HintPath>$(GameDataDir)/0Harmony.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="sts2" Condition="'$(UseReferenceAssemblies)' != 'true'"><HintPath>$(GameDataDir)/sts2.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="GodotSharp" Condition="'$(UseReferenceAssemblies)' != 'true'"><HintPath>$(GameDataDir)/GodotSharp.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="0Harmony" Condition="'$(UseReferenceAssemblies)' != 'true'"><HintPath>$(GameDataDir)/0Harmony.dll</HintPath><Private>false</Private></Reference>
+    <PackageReference Include="Book.StS2.RefLib" Version="[0.111.0-beta]" IncludeAssets="compile" PrivateAssets="all" Condition="'$(UseReferenceAssemblies)' == 'true'" />
     <None Include="../../TouchSts2.json" Link="TouchSts2.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
-  <Target Name="CheckGameReferences" BeforeTargets="ResolveReferences">
+  <Target Name="CheckGameReferences" BeforeTargets="ResolveReferences" Condition="'$(UseReferenceAssemblies)' != 'true'">
     <Error Condition="!Exists('$(GameDataDir)/sts2.dll')" Text="Game assembly missing. Pass -p:GameDir=... or -p:GameDataDir=... (the directory containing sts2.dll)." />
   </Target>
 </Project>
