@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AssemblyName>TouchSts2</AssemblyName>
+    <Version>0.2.4</Version>
+    <GameDir Condition="'$(GameDir)' == ''">C:/Program Files (x86)/Steam/steamapps/common/Slay the Spire 2</GameDir>
+    <GameDataDir Condition="'$(GameDataDir)' == ''">$(GameDir)/data_sts2_windows_x86_64</GameDataDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="../../research/sts1/orb.png" LogicalName="TouchSts2.sts1.orb.png" />
+    <EmbeddedResource Include="Localization/strings.json" LogicalName="TouchSts2.Localization.strings.json" />
+    <Reference Include="sts2"><HintPath>$(GameDataDir)/sts2.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="GodotSharp"><HintPath>$(GameDataDir)/GodotSharp.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="0Harmony"><HintPath>$(GameDataDir)/0Harmony.dll</HintPath><Private>false</Private></Reference>
+    <None Include="../../TouchSts2.json" Link="TouchSts2.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <Target Name="CheckGameReferences" BeforeTargets="ResolveReferences">
+    <Error Condition="!Exists('$(GameDataDir)/sts2.dll')" Text="Game assembly missing. Pass -p:GameDir=... or -p:GameDataDir=... (the directory containing sts2.dll)." />
+  </Target>
+</Project>

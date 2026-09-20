@@ -1,0 +1,21 @@
+# Build output
+bin/
+obj/
+dist/
+*.user
+
+# Local research artifacts (decompiled game sources — never commit)
+research/
+*.decomp/
+
+# IDE
+.vs/
+.idea/
+*.suo
+
+# SDK state and proprietary mobile research inputs
+.dotnet/
+*.apk
+*.apks
+*.xapk
+*.obb

@@ -1,0 +1,18 @@
+{
+  "eng": { "TouchscreenMode": "Touchscreen mode", "HoldToInspect": "Hold to inspect", "TouchFeedback": "Touch feedback" },
+  "zhs": { "TouchscreenMode": "触屏模式", "HoldToInspect": "长按查看", "TouchFeedback": "触点反馈" },
+  "zht": { "TouchscreenMode": "觸控模式", "HoldToInspect": "長按查看", "TouchFeedback": "觸控回饋" },
+  "deu": { "TouchscreenMode": "Touchscreen-Modus", "HoldToInspect": "Zum Ansehen gedrückt halten", "TouchFeedback": "Berührungen anzeigen" },
+  "esp": { "TouchscreenMode": "Modo de pantalla táctil", "HoldToInspect": "Mantener pulsado para ver", "TouchFeedback": "Indicador táctil" },
+  "fra": { "TouchscreenMode": "Mode tactile", "HoldToInspect": "Appui long pour examiner", "TouchFeedback": "Indicateur tactile" },
+  "ind": { "TouchscreenMode": "Mode layar sentuh", "HoldToInspect": "Tahan untuk melihat detail", "TouchFeedback": "Indikator sentuhan" },
+  "ita": { "TouchscreenMode": "Modalità touch", "HoldToInspect": "Tieni premuto per esaminare", "TouchFeedback": "Indicatore del tocco" },
+  "jpn": { "TouchscreenMode": "タッチ操作モード", "HoldToInspect": "長押しで詳細を表示", "TouchFeedback": "タッチ位置を表示" },
+  "kor": { "TouchscreenMode": "터치스크린 모드", "HoldToInspect": "길게 눌러 자세히 보기", "TouchFeedback": "터치 위치 표시" },
+  "pol": { "TouchscreenMode": "Tryb dotykowy", "HoldToInspect": "Przytrzymaj, aby obejrzeć", "TouchFeedback": "Wskaźnik dotyku" },
+  "ptb": { "TouchscreenMode": "Modo de tela sensível ao toque", "HoldToInspect": "Segurar para inspecionar", "TouchFeedback": "Indicador de toque" },
+  "rus": { "TouchscreenMode": "Сенсорное управление", "HoldToInspect": "Удерживать для просмотра", "TouchFeedback": "Индикатор касания" },
+  "spa": { "TouchscreenMode": "Modo de pantalla táctil", "HoldToInspect": "Mantener pulsado para ver", "TouchFeedback": "Indicador táctil" },
+  "tha": { "TouchscreenMode": "โหมดหน้าจอสัมผัส", "HoldToInspect": "กดค้างเพื่อดูรายละเอียด", "TouchFeedback": "แสดงตำแหน่งสัมผัส" },
+  "tur": { "TouchscreenMode": "Dokunmatik ekran modu", "HoldToInspect": "İncelemek için basılı tut", "TouchFeedback": "Dokunma göstergesi" }
+}
