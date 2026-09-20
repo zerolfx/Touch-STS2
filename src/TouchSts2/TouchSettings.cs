@@ -9,6 +9,13 @@ internal static class TouchSettings
     public static bool Diagnostics { get; private set; }
     public static bool LongPressInspect { get; private set; } = true;
     public static bool TouchFeedback { get; private set; } = true;
+    public static event Action? Changed;
+    internal static readonly TouchOption[] Options =
+    [
+        new("TouchscreenMode", false, () => Enabled, SetEnabled),
+        new("HoldToInspect", true, () => LongPressInspect, SetLongPressInspect),
+        new("TouchFeedback", true, () => TouchFeedback, SetTouchFeedback)
+    ];
 
     public static void Load()
     {
@@ -24,6 +31,7 @@ internal static class TouchSettings
 
     public static void SetEnabled(bool enabled)
     {
+        if (Enabled == enabled) return;
         TouchRuntime.Cancel("setting changed");
         TouchUi.Reset();
         TouchConfirmation.Clear();
@@ -33,8 +41,20 @@ internal static class TouchSettings
         GD.Print($"[TouchSts2] Touchscreen Mode = {enabled}");
     }
 
-    public static void SetLongPressInspect(bool enabled) { LongPressInspect = enabled; Save(); }
-    public static void SetTouchFeedback(bool enabled) { TouchFeedback = enabled; TouchCursor.Reset(); Save(); }
+    public static void SetLongPressInspect(bool enabled)
+    {
+        if (LongPressInspect == enabled) return;
+        LongPressInspect = enabled;
+        Save();
+    }
+
+    public static void SetTouchFeedback(bool enabled)
+    {
+        if (TouchFeedback == enabled) return;
+        TouchFeedback = enabled;
+        TouchCursor.Reset();
+        Save();
+    }
 
     private static void Save()
     {
@@ -46,5 +66,6 @@ internal static class TouchSettings
         DirAccess.MakeDirRecursiveAbsolute(ProjectSettings.GlobalizePath("user://mod_configs"));
         var result = cfg.Save(Path);
         if (result != Error.Ok) GD.PushError($"[TouchSts2] Configuration save failed: {result}");
+        Changed?.Invoke();
     }
 }

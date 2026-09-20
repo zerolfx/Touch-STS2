@@ -12,19 +12,29 @@ internal static class SettingsUi
     public static void AddTo(NInputSettingsPanel panel)
     {
         if (panel.Content.HasNode("TouchSts2Setting")) return;
-        AddToggle(panel, "TouchSts2Feedback", "TouchFeedback", TouchSettings.TouchFeedback, TouchSettings.SetTouchFeedback);
-        AddToggle(panel, "TouchSts2LongPress", "HoldToInspect", TouchSettings.LongPressInspect, TouchSettings.SetLongPressInspect);
-        AddToggle(panel, "TouchSts2Setting", "TouchscreenMode", TouchSettings.Enabled, TouchSettings.SetEnabled);
+        AddOptions(panel.Content, true);
         panel.Call("UpdateNavigation");
     }
 
-    private static void AddToggle(NInputSettingsPanel panel, string name, string key, bool value, Action<bool> changed)
+    internal static void AddOptions(Control container, bool prepend = false)
     {
-        var row = new HBoxContainer { Name = name, CustomMinimumSize = new Vector2(0, 80) };
+        var options = prepend ? TouchSettings.Options.Reverse() : TouchSettings.Options;
+        foreach (var option in options) AddToggle(container, option, prepend);
+    }
+
+    private static void AddToggle(Control container, TouchOption option, bool prepend)
+    {
+        var row = new HBoxContainer
+        {
+            Name = option.Key == "TouchscreenMode" ? "TouchSts2Setting" : "TouchSts2" + option.Key,
+            CustomMinimumSize = new Vector2(0, 80)
+        };
         var label = new MegaLabel
         {
-            Text = TouchText.Get(LocManager.Instance.Language, key),
-            MaxFontSize = 28, MinFontSize = 18,
+            Text = TouchText.Get(LocManager.Instance.Language, option.Key),
+            // Match native settings; initial zero-sized container layout must not shrink the text.
+            AutoSizeEnabled = false,
+            AutowrapMode = TextServer.AutowrapMode.WordSmart,
             VerticalAlignment = VerticalAlignment.Center,
             SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
             MouseFilter = Control.MouseFilterEnum.Ignore
@@ -35,7 +45,7 @@ internal static class SettingsUi
         row.AddChild(label);
         var toggle = new NTickbox
         {
-            Name = "TouchscreenToggle", CustomMinimumSize = new Vector2(100, 80),
+            Name = "TouchscreenToggle", CustomMinimumSize = new Vector2(320, 80),
             FocusMode = Control.FocusModeEnum.All
         };
         // tickbox.tscn contains only the visuals, not the NTickbox script.
@@ -43,20 +53,25 @@ internal static class SettingsUi
         toggle.AddChild(visuals);
         visuals.Owner = toggle;
         visuals.UniqueNameInOwner = true;
-        visuals.Position = new Vector2(18, 8);
+        visuals.Position = new Vector2(128, 8);
         row.AddChild(toggle);
-        panel.Content.AddChild(row);
-        panel.Content.MoveChild(row, 0);
-        toggle.IsTicked = value;
-        toggle.Toggled += tickbox => changed(tickbox.IsTicked);
+        container.AddChild(row);
+        if (prepend) container.MoveChild(row, 0);
+        toggle.IsTicked = option.Get();
+        toggle.Toggled += tickbox => option.Set(tickbox.IsTicked);
+        void Sync() => toggle.IsTicked = option.Get();
+        TouchSettings.Changed += Sync;
         LocManager.LocaleChangeCallback refresh = () =>
         {
+            label.AddThemeFontOverride("font", ResourceLoader.Load<Font>("res://themes/kreon_regular_glyph_space_one.tres"));
             label.RefreshFont(); // Use the game's CJK/Thai/Cyrillic font substitutions.
-            label.SetTextAutoSize(TouchText.Get(LocManager.Instance.Language, key));
+            label.Text = TouchText.Get(LocManager.Instance.Language, option.Key);
         };
         LocManager.Instance.SubscribeToLocaleChange(refresh);
-        row.TreeExiting += () => LocManager.Instance.UnsubscribeToLocaleChange(refresh);
-        // Uses the game's own NTickbox, so its directional-navigation scan includes us.
-        panel.Call("UpdateNavigation");
+        row.TreeExiting += () =>
+        {
+            TouchSettings.Changed -= Sync;
+            LocManager.Instance.UnsubscribeToLocaleChange(refresh);
+        };
     }
 }

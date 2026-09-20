@@ -203,6 +203,7 @@ internal static class TouchRuntime
         if (!_initialized)
         {
             _initialized = true;
+            SettingsIntegrations.Initialize();
             GD.Print($"[TouchSts2] game={NGame.GetGameVersion()}; engine={Engine.GetVersionInfo()}; display={DisplayServer.GetName()}; dpi={DisplayServer.ScreenGetDpi()}; emulateMouseFromTouch={Input.EmulateMouseFromTouch}; viewport={ViewSize}");
             if (!NGame.GetGameVersion().Contains("0.111.0"))
                 GD.PushWarning("[TouchSts2] Game differs from the v0.111.0 API baseline; runtime validation required.");

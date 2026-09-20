@@ -8,6 +8,8 @@ Accept the game's initial mod-loading warning with a mouse or controller. Enabli
 
 Input settings provide **Touchscreen mode**, **Hold to inspect**, and **Touch feedback**, translated into the current game language. Touchscreen mode defaults to off and changes immediately. The two optional aids default to on. Preferences are stored in `TouchSts2.cfg` and apply across save slots.
 
+When BaseLib or ModConfig is installed, its configuration tab also lists Touch-STS2. All entry points share these preferences; neither plugin is required. Restart after updating the mod to load the new settings integration.
+
 While enabled, mouse input follows the same rules as touch input. Mouse movement does not disable the preference. Controller input temporarily suspends it; clicking restores it. This also supports platforms that expose touches only as mouse events.
 
 ## Combat
@@ -38,7 +40,7 @@ Touch feedback uses STS1 PC's original orb texture and fade formula. It fades ev
 
 ## Compatibility
 
-The implementation targets STS2 v0.111.0. Earlier releases were tested in-game using mouse input, not injected or physical touch events. Releases 0.2.1 through 0.2.4 received offline checks only.
+The implementation targets STS2 v0.111.0. User acceptance was completed on September 20, 2026, with recordings demonstrating combat, reward selection, and shop confirmation. The recordings do not identify the input hardware. The settings changes in 0.2.5 have offline checks only.
 
 Physical touch, Windows long-press promotion, multiple fingers, Steam Deck/gamescope, controller hardware, and multiplayer require further device testing. See [testing](TESTING.md) for exact evidence and the manual checklist.
 

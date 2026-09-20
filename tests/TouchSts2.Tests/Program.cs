@@ -294,8 +294,9 @@ foreach (var (fps, frames) in new[] { (30, 41), (60, 83), (144, 202) })
     Equal(0f, cursor.Alpha, "repeated held event does not revive faded cursor");
 }
 Console.WriteLine($"PASS: {checks - cursorChecks} STS1 cursor checks at 30/60/144 Hz.");
+Console.WriteLine($"PASS: {SettingsAdapterChecks.Run()} optional settings adapter checks.");
 
-if (args.Length == 2)
+if (args.Length >= 2)
 {
     string gameData = Path.GetFullPath(args[0]);
     System.Runtime.Loader.AssemblyLoadContext.Default.Resolving += (_, name) =>
@@ -318,4 +319,5 @@ if (args.Length == 2)
     using var translations = System.Text.Json.JsonDocument.Parse(strings);
     Equal(16, translations.RootElement.EnumerateObject().Count(), "release DLL embeds all translations");
     Console.WriteLine("This is a static API check, not proof that in-game input works.");
+    if (args.Length == 3) SettingsAdapterChecks.VerifyInstalledPlugins(args[2]);
 }
