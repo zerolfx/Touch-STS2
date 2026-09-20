@@ -8,7 +8,7 @@ The recorded game baseline is Windows STS2 v0.111.0, MegaDot 4.5.1-m.14, and .NE
 
 ## Current offline checks
 
-Version 0.2.7 builds in Release with zero warnings and zero errors. The checks cover:
+Version 0.2.8 builds in Release with zero warnings and zero errors. The checks cover:
 
 | Group | Coverage |
 |---|---|
@@ -29,6 +29,26 @@ The 0.2.7 event changes have source/API checks and engine-free confirmation life
 The co-op policy tests receive target validity as an input. They do not prove real friend/enemy classification or synchronization in a multiplayer room. Native validation calls and source inspection support the implementation, but a real session remains necessary.
 
 The cursor tests establish resource identity and fade-state behavior. They do not establish cross-engine pixel equivalence or identical visibility in every STS1 state; see [the STS1 reference](STS1_REFERENCE.md).
+
+## Hover handoff regression
+
+The 0.2.8 fix refreshes native hover immediately after the deferred tap's release, while input replay is still guarded. It sends a motion event with no pressed buttons at the release position. Drag and hold paths do not replay a tap and are unchanged.
+
+An isolated headless test on the installed MegaDot 4.5.1-m.14 engine reproduces a covered card retaining its tooltip after a click opens a preview. Refreshing hover removes that tooltip, activates the new preview's hover, does not click through, and allows the original hover to return when the preview closes. All 8 checks pass. This tests engine dispatch with minimal controls, not the actual upgrade card scene or physical touch hardware.
+
+The engine updates mouse enter/exit before calling the mod's input handler, so swallowing motion alone is not evidence of stale hover. The confirmed gap is the UI replacement after the final input event. This can also occur with an ordinary mouse release; the test does not establish that it is exclusive to the mod. The fix covers the mod's deferred replay without changing tooltip placement.
+
+To repeat with a Godot executable, set `$engine` to its executable and run:
+
+```powershell
+Compress-Archive -Path tests/TouchSts2.HoverChecks/project.godot,tests/TouchSts2.HoverChecks/hover_replay.gd -DestinationPath dist/hover-checks.zip -Force
+& $engine --headless --main-pack "$PWD/dist/hover-checks.zip" --script res://hover_replay.gd | Out-Host
+if ($LASTEXITCODE -ne 0) { throw 'Hover checks failed.' }
+```
+
+In-game follow-up: select a card with generated-card tips for upgrading, inspect both comparison cards, cancel, and repeat. Also check grid scrolling and long-press inspection. Any overlap that persists with the correct preview owner requires separate layout investigation.
+
+The 0.2.8 menu-cursor change checks the displayed submenu, preserving the native cursor only on the main-menu home page, pause menu, and settings, including dialogs above those pages. Lobbies, the compendium, run history, patch notes, and other subpages retain touch behavior. Combat pointer parking is skipped on the route to settings. Build and existing offline checks cover compatibility only; visually verify the route to disabling touch mode, transitions to other subpages, controller handoff, and returning to combat.
 
 ## Continuous integration
 

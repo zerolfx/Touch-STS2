@@ -143,6 +143,10 @@ internal static class TouchUi
                     using var up = new InputEventMouseButton { ButtonIndex = MouseButton.Left, Pressed = false, Position = end, GlobalPosition = end };
                     viewport.PushInput(down, true);
                     viewport.PushInput(up, true);
+                    // Release can open a preview after the last physical input event.
+                    // Refresh hover against the new UI so covered card tips are removed.
+                    using var hover = new InputEventMouseMotion { Position = end, GlobalPosition = end };
+                    viewport.PushInput(hover, true);
                 }
                 finally { _replaying = false; }
             }).CallDeferred();

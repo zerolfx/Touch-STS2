@@ -2,6 +2,11 @@
 
 Release notes describe implementation changes. Offline checks and in-game validation are recorded separately in the [test report](docs/TESTING.md).
 
+## 0.2.8 - 2026-09-21
+
+- Keep the native cursor on the main-menu home page, pause menu, and settings so touch mode can be disabled with a mouse. Other menu subpages retain touch behavior; opening the pause menu does not move the pointer away.
+- Refresh hover after a touchscreen selection opens a preview, preventing covered cards from leaving their tooltips over the new screen.
+
 ## 0.2.7 - 2026-09-20
 
 - Use the simple card grid's native confirmation button for touchscreen choices, including event rewards and generated-card selections.

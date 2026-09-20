@@ -12,6 +12,8 @@ When BaseLib or ModConfig is installed, its configuration tab also lists Touch-S
 
 While enabled, mouse input follows the same rules as touch input. Mouse movement does not disable the preference. Controller input temporarily suspends it; clicking restores it. This also supports platforms that expose touches only as mouse events.
 
+The main-menu home page, Esc pause menu, and settings keep the native mouse cursor so you can easily turn touchscreen mode off. Other pages, including multiplayer lobbies, the compendium, and run history, retain touch behavior. Controller navigation retains the game's normal cursor behavior.
+
 ## Combat
 
 - Drag a targeted card into the play area: the card stays at the lower center while the targeting arrow follows the pointer. Release over a legal target to play.

@@ -8,7 +8,11 @@ using MegaCrit.Sts2.Core.Nodes.Cards.Holders;
 using MegaCrit.Sts2.Core.Nodes.Combat;
 using MegaCrit.Sts2.Core.Nodes.CommonUi;
 using MegaCrit.Sts2.Core.Nodes.Rooms;
+using MegaCrit.Sts2.Core.Nodes.Screens;
+using MegaCrit.Sts2.Core.Nodes.Screens.Capstones;
+using MegaCrit.Sts2.Core.Nodes.Screens.PauseMenu;
 using MegaCrit.Sts2.Core.Nodes.Screens.ScreenContext;
+using MegaCrit.Sts2.Core.Nodes.Screens.Settings;
 using MegaCrit.Sts2.Core.Nodes.Multiplayer;
 using TouchSts2.Interaction;
 
@@ -37,6 +41,19 @@ internal static class TouchRuntime
     private static int _diagnosticEvents;
     private static double _diagnosticWindow;
     public static bool Active => GameAdapter.Healthy && !_faulted && TouchSettings.Enabled && !_controllerSuspended;
+    internal static bool UseTouchCursor => Active && !IsSettingsRoute;
+    // Preserve a mouse-accessible route to disabling touch mode, not all menu subpages.
+    private static bool IsSettingsRoute
+    {
+        get
+        {
+            if (NGame.Instance?.MainMenu is { } menu)
+                return menu.PatchNotesScreen?.IsOpen != true &&
+                    menu.SubmenuStack?.Peek() is null or NSettingsScreen;
+            return NCapstoneContainer.Instance?.CurrentCapstoneScreen is NCapstoneSubmenuStack stack &&
+                stack.Stack.Peek() is NPauseMenu or NSettingsScreen;
+        }
+    }
     public static bool HasCard => _play != null && GodotObject.IsInstanceValid(_play) && !_play.IsQueuedForDeletion();
     public static bool CommitRequested { get; private set; }
     public static bool Submitting { get; private set; }
@@ -289,7 +306,7 @@ internal static class TouchRuntime
         if (_parkPending && !HasCard && !_pointerDown && _switchTo == null)
         {
             _parkPending = false;
-            ParkPointer();
+            if (UseTouchCursor) ParkPointer();
         }
         RefreshCursor();
     }
@@ -451,10 +468,11 @@ internal static class TouchRuntime
 
     public static void RefreshCursor()
     {
-        if (!Active) TouchCursor.Reset();
-        if (Active) Input.MouseMode = Input.MouseModeEnum.Hidden;
+        bool hide = UseTouchCursor;
+        if (!hide) TouchCursor.Reset();
+        if (hide) Input.MouseMode = Input.MouseModeEnum.Hidden;
         else if (_cursorHidden) NGame.Instance?.CursorManager?.SetCursorShown(true);
-        _cursorHidden = Active;
+        _cursorHidden = hide;
     }
 
     private static void Probe(InputEvent input)

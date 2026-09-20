@@ -14,7 +14,7 @@ internal static class TouchCursor
 
     public static void Tick(float delta)
     {
-        if (!TouchRuntime.Active || !TouchSettings.TouchFeedback || NGame.Instance == null || !NGame.IsGameFocusedWindow())
+        if (!TouchRuntime.UseTouchCursor || !TouchSettings.TouchFeedback || NGame.Instance == null || !NGame.IsGameFocusedWindow())
         {
             Reset();
             return;
