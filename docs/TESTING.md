@@ -8,7 +8,7 @@ The recorded game baseline is Windows STS2 v0.111.0, MegaDot 4.5.1-m.14, and .NE
 
 ## Current offline checks
 
-Version 0.2.5 builds in Release with zero warnings and zero errors. The checks cover:
+Version 0.2.6 builds in Release with zero warnings and zero errors. The checks cover:
 
 | Group | Coverage |
 |---|---|
@@ -18,8 +18,10 @@ Version 0.2.5 builds in Release with zero warnings and zero errors. The checks c
 | 67 settings adapter checks | Registration, all translated labels, preserved preferences, real defaults, two-way synchronization, redundant-write suppression, and BaseLib callback dispatch |
 | Optional plugin contracts | Installed BaseLib 3.4.7 and ModConfig 0.2.3 public APIs resolve; the BaseLib adapter type can be generated without starting the engine |
 | Cursor resource | Embedded texture matches the STS1 PC SHA-256 |
-| 18 patch targets | Actual game method signatures and associated mouse, position, scroll, target, and reward-preview contracts resolve |
+| 19 patch targets | Actual game method signatures and associated mouse, position, scroll, target, reward-preview, and treasure-selection contracts resolve |
 | Embedded localization | Release DLL contains all 16 language tables |
+
+The 0.2.6 treasure fix reuses the existing confirmation lifecycle. Source inspection verifies that staging does not call the native vote method, and the added patch and private fields resolve against the installed game. This is not a live multiplayer result.
 
 The co-op policy tests receive target validity as an input. They do not prove real friend/enemy classification or synchronization in a multiplayer room. Native validation calls and source inspection support the implementation, but a real session remains necessary.
 
@@ -29,9 +31,9 @@ The cursor tests establish resource identity and fade-state behavior. They do no
 
 GitHub Actions builds the managed DLL on one Ubuntu runner using a pinned, locked compile-only reference package. The job runs the pure checks and inspects the final ZIP's allowlist, manifest, assembly identity/version, embedded translations, and cursor hash. Six malformed-package fixtures verify rejection of unexpected payloads and missing or changed files. Each successful build uploads the installation ZIP, a checksum, and a per-file verification report.
 
-The 18 runtime patch-contract checks require actual installed game assemblies and remain part of the installed-game build. Reference-only CI reports this distinction explicitly. The cloud job does not start the game. See [build and release](BUILD.md) for commands and artifact details.
+The 19 runtime patch-contract checks require actual installed game assemblies and remain part of the installed-game build. Reference-only CI reports this distinction explicitly. The cloud job does not start the game. See [build and release](BUILD.md) for commands and artifact details.
 
-The Workshop script's dry run verifies the package again and stages the bilingual metadata, flat install payload, cover, three ordered GIFs, and English/Chinese settings screenshots. All previews and the cover are checked against the uploader's 1 MB limit. The actual Steam submission remains untested until the first upload; dry runs never contact Steam.
+The Workshop script's dry run verifies the package again and stages the bilingual metadata, flat install payload, cover, three ordered GIFs, and English/Chinese settings screenshots. All previews and the cover are checked against the uploader's 1 MB limit. The official uploader has successfully created and updated the Workshop item. Dry runs never contact Steam. Versioned bilingual change notes are required unless explicitly overridden.
 
 ## Historical runtime evidence
 
@@ -130,7 +132,7 @@ Native confirmation scenes, settings font updates, shared removal flows, party-s
 - **Engine fork:** upstream Godot behavior is evidence, not proof of MegaDot's exact dispatch order. Observe the shipped engine rather than assuming every upstream detail is unchanged.
 - **Early card pickup:** newly drawn holders temporarily disable their hitboxes during animation. Measure whether fast first taps are lost before considering input buffering.
 - **Pointer cleanup:** verify neutral synthetic motion clears hover even if the platform ignores the hardware warp, including after overlays appear.
-- **Multiplayer:** test host and client submission, party-sidebar targets, disconnects, and action completion timing.
+- **Multiplayer:** test host and client submission, party-sidebar targets, disconnects, and action completion timing. For treasure chests, have every other player vote first: tapping or changing a relic must not send a vote or start distribution; pressing confirm must submit exactly once. Repeat with a single available relic, cancel by tapping blank space or Escape, leave and reopen the screen, and verify invalidated choices cannot submit. Check native single-player, controller, and touch-disabled behavior.
 - **Continuous holds:** validate the 0.55-second inspector with physical input and slow frames, including release after the threshold and dragging away.
 - **Native UI details:** check dropdowns, credits, timeline scrolling, transform selection, and context cleanup on the real device. Existing source coverage should not be reported as a runtime pass.
 

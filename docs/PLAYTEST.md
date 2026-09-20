@@ -26,6 +26,8 @@ While enabled, mouse input follows the same rules as touch input. Mouse movement
 
 Card rewards, generic card/relic choices, shop purchases, removal services, and rest-site options use selection followed by a native confirmation button. Existing skip and other reward controls remain available. Selecting another item replaces the pending choice; tapping empty space or pressing Escape clears it.
 
+Co-op treasure chests also require confirmation, even when only one relic is available. Tapping a relic previews it locally; only the confirmation button submits your vote to the party. You can change your choice before confirming. Unconfirmed choices are canceled when the screen closes or relic distribution starts.
+
 Deck removal, upgrade, transform, enchantment, and bundle selection keep their existing native preview and confirmation screens. This includes removal initiated by events and relics, not just shops. Selection counts, mandatory choices, and effect-specific confirmation rules remain native.
 
 Drag lists from their entries to scroll. Once the drag threshold is crossed, that gesture cannot also select an item, even if the pointer returns to its starting point. The timeline scrolls horizontally. Map scrolling and node selection keep their native rules.
@@ -40,7 +42,7 @@ Touch feedback uses STS1 PC's original orb texture and fade formula. It fades ev
 
 ## Compatibility
 
-The implementation targets STS2 v0.111.0. User acceptance was completed on September 20, 2026, with recordings demonstrating combat, reward selection, and shop confirmation. The recordings do not identify the input hardware. The settings changes in 0.2.5 have offline checks only.
+The implementation targets STS2 v0.111.0. User acceptance was completed on September 20, 2026, with recordings demonstrating combat, reward selection, and shop confirmation. The recordings do not identify the input hardware. The co-op treasure confirmation added in 0.2.6 has been checked against the game API but still needs a live multiplayer test.
 
 Physical touch, Windows long-press promotion, multiple fingers, Steam Deck/gamescope, controller hardware, and multiplayer require further device testing. See [testing](TESTING.md) for exact evidence and the manual checklist.
 

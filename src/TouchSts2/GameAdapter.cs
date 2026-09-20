@@ -15,6 +15,8 @@ using MegaCrit.Sts2.Core.Nodes.Screens.MainMenu;
 using MegaCrit.Sts2.Core.Nodes.Screens;
 using MegaCrit.Sts2.Core.Nodes.Relics;
 using MegaCrit.Sts2.Core.Nodes.Rewards;
+using MegaCrit.Sts2.Core.Nodes.Screens.TreasureRoomRelic;
+using MegaCrit.Sts2.Core.Runs;
 
 namespace TouchSts2;
 
@@ -44,6 +46,7 @@ internal static class GameAdapter
             (typeof(NCardRewardSelectionScreen), "SelectCard", [typeof(NCardHolder)], nameof(RewardSelected), null),
             (typeof(NChooseACardSelectionScreen), "SelectHolder", [typeof(NCardHolder)], nameof(ChoiceCardSelected), null),
             (typeof(NChooseARelicSelection), "SelectHolder", [typeof(NRelicBasicHolder)], nameof(ChoiceRelicSelected), null),
+            (typeof(NTreasureRoomRelicCollection), "PickRelic", [typeof(NTreasureRoomRelicHolder)], nameof(TreasureRelicSelected), null),
             (typeof(NMerchantSlot), "OnSelected", [], nameof(ShopSelected), null),
             (typeof(NRestSiteButton), "SelectOption", [typeof(RestSiteOption)], nameof(RestSelected), null),
             (typeof(NCardHolder), "ClearHoverTips", [], nameof(ClearCardTips), null),
@@ -59,8 +62,11 @@ internal static class GameAdapter
         foreach (var type in new[] { typeof(NChooseACardSelectionScreen), typeof(NChooseARelicSelection) })
             if (AccessTools.Field(type, "_screenComplete")?.FieldType != typeof(bool))
                 throw new MissingFieldException(type.FullName, "_screenComplete");
-        if (AccessTools.Field(typeof(NChooseACardSelectionScreen), "_openedTicks")?.FieldType != typeof(ulong))
-            throw new MissingFieldException(typeof(NChooseACardSelectionScreen).FullName, "_openedTicks");
+        foreach (var type in new[] { typeof(NChooseACardSelectionScreen), typeof(NTreasureRoomRelicCollection) })
+            if (AccessTools.Field(type, "_openedTicks")?.FieldType != typeof(ulong))
+                throw new MissingFieldException(type.FullName, "_openedTicks");
+        if (AccessTools.Field(typeof(NTreasureRoomRelicCollection), "_runState")?.FieldType != typeof(IRunState))
+            throw new MissingFieldException(typeof(NTreasureRoomRelicCollection).FullName, "_runState");
         if (AccessTools.Property(typeof(NTargetManager), "HoveredNode")?.PropertyType != typeof(Node))
             throw new MissingMemberException("NTargetManager.HoveredNode");
         if (AccessTools.DeclaredMethod(typeof(NRewardButton), "OnFocus", []) == null)
@@ -158,6 +164,25 @@ internal static class GameAdapter
 
     private static bool ChoiceAvailable(Control screen) => TouchConfirmation.Usable(screen) &&
         !screen.Get("_screenComplete").AsBool();
+
+    private static bool TreasureRelicSelected(NTreasureRoomRelicCollection __instance,
+        NTreasureRoomRelicHolder holder, IRunState ____runState, ulong ____openedTicks)
+    {
+        if (!TouchRuntime.Active || TouchConfirmation.Submitting || ____runState.Players.Count <= 1) return true;
+        if (Time.GetTicksMsec() - ____openedTicks <= 200) return false;
+        var synchronizer = RunManager.Instance.TreasureRoomRelicSynchronizer;
+        var relics = synchronizer.CurrentRelics;
+        var relic = holder.Relic.Model;
+        int index = holder.Index;
+        // Preview locally: PickRelic sends a vote and may immediately finish allocation.
+        return !TouchConfirmation.Stage(holder,
+            () => __instance.Call("PickRelic", holder),
+            () => TouchConfirmation.Usable(__instance) && TouchConfirmation.Usable(holder) && holder.IsEnabled &&
+                holder.Index == index && ReferenceEquals(relic, holder.Relic.Model) &&
+                ReferenceEquals(synchronizer, RunManager.Instance.TreasureRoomRelicSynchronizer) &&
+                relics != null && ReferenceEquals(relics, synchronizer.CurrentRelics) &&
+                index >= 0 && index < relics.Count && ReferenceEquals(relic, relics[index]));
+    }
 
     private static bool RestSelected(NRestSiteButton __instance, RestSiteOption option, ref Task __result, MethodBase __originalMethod)
     {

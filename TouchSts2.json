@@ -3,7 +3,7 @@
   "name": "Touch STS2",
   "author": "Touch-STS2 contributors",
   "description": "STS1-style touchscreen combat, reward/shop/rest confirmations, safe list dragging and card inspection.",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "has_pck": false,
   "has_dll": true,
   "affects_gameplay": false,

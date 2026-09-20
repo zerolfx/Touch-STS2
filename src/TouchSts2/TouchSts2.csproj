@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <AssemblyName>TouchSts2</AssemblyName>
-    <Version>0.2.5</Version>
+    <Version>0.2.6</Version>
     <GameDir Condition="'$(GameDir)' == ''">C:/Program Files (x86)/Steam/steamapps/common/Slay the Spire 2</GameDir>
     <GameDataDir Condition="'$(GameDataDir)' == ''">$(GameDir)/data_sts2_windows_x86_64</GameDataDir>
     <RestorePackagesWithLockFile Condition="'$(UseReferenceAssemblies)' == 'true'">true</RestorePackagesWithLockFile>

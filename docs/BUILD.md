@@ -33,7 +33,7 @@ The job:
 3. Creates the versioned installation ZIP.
 4. Inspects the ZIP and its managed DLL without executing the mod.
 5. Checks that deliberately malformed packages are rejected.
-6. Stages the bilingual Workshop description, cover, three GIFs, and two settings screenshots in dry-run mode without contacting Steam.
+6. Stages the bilingual Workshop description and versioned change notes, cover, three GIFs, and two settings screenshots in dry-run mode without contacting Steam.
 7. Uploads the verified ZIP, its SHA-256 checksum, and a JSON verification report for 14 days.
 
 Download artifacts from the workflow run's summary. The outer Actions download contains the versioned installation ZIP and its two verification files. The installation ZIP contains only the mod DLL, matching manifest, and player guide inside a single mod folder.
@@ -48,7 +48,7 @@ PE metadata is inspected without loading the DLL. The verifier checks assembly i
 
 Negative fixtures cover an extra DLL, duplicate entry, path traversal, missing DLL, substituted manifest, and empty guide. Run those checks after packaging with the repository's `test-package-validation.ps1` script and its `-PackagePath` parameter.
 
-Reference-only CI cannot execute the game's patch-contract reflection checks. Before release, build against the installed game assemblies to resolve the 18 patch targets and associated private fields. The cloud build and a successful contract check still do not replace in-game tests. See [testing](TESTING.md).
+Reference-only CI cannot execute the game's patch-contract reflection checks. Before release, build against the installed game assemblies to resolve the 19 patch targets and associated private fields. The cloud build and a successful contract check still do not replace in-game tests. See [testing](TESTING.md).
 
 ## Steam Workshop release
 
@@ -69,8 +69,10 @@ Create the Workshop item with private visibility:
 The successful upload saves the ID in `workshop/mod_id.txt`. Keep this file so the ordinary command updates the same item:
 
 ```powershell
-./scripts/upload-workshop.ps1 -ChangeNote 'Improve touchscreen settings'
+./scripts/upload-workshop.ps1
 ```
+
+Each version needs nonempty bilingual release notes in `workshop/changelog/<version>.bbcode`. The script publishes them to the Workshop Change Notes tab automatically and checks them during dry runs. Use `-ChangeNote` to override the text for a metadata-only update.
 
 Use `-ItemId` to adopt an existing item, `-Visibility public` to publish it, or `-PackagePath` to upload an already verified ZIP instead of rebuilding. Updates preserve visibility unless explicitly changed. If a creation fails after Steam has allocated an item, check the uploader log for that ID and retry with `-ItemId`; do not create a duplicate. Steam may require acceptance of the Workshop agreement before an item becomes visible.
 
@@ -80,6 +82,7 @@ Repository assets:
 |---|---|
 | [workshop.json](../workshop/workshop.json) | Title, tags, and required-item metadata |
 | [description.bbcode](../workshop/description.bbcode) | Matching English and Chinese descriptions, with source and issue links |
+| [changelog](../workshop/changelog) | Versioned bilingual notes for the Workshop Change Notes tab |
 | [workshop-cover.png](../media/workshop-cover.png) | Generated tablet and handheld touchscreen illustration |
 | [workshop-previews](../media/workshop-previews) | Combat, card rewards, shop confirmation, English settings, then Chinese settings |
 | [media](../media) | Larger GIFs for the project overview |
@@ -90,6 +93,6 @@ Upload workspaces and logs remain under the ignored build-output directory. Neit
 
 ## Repository conventions
 
-Use English for source comments, documentation, test descriptions, and commit messages. Non-English strings belong in localization resources or localization test fixtures; the Workshop title and bilingual description are also localized publication content. Keep exact translated expectations in those fixtures instead of hiding them as Unicode escapes in general-purpose source files.
+Use English for source comments, documentation, test descriptions, and commit messages. Non-English strings belong in localization resources or localization test fixtures; the Workshop title, bilingual description, and change notes are also localized publication content. Keep exact translated expectations in those fixtures instead of hiding them as Unicode escapes in general-purpose source files.
 
 Keep the README focused on the project overview. Record release changes in [CHANGELOG.md](../CHANGELOG.md). The technical documentation consists of the [player guide](PLAYTEST.md), this build guide, [architecture](ARCHITECTURE.md), [STS1 reference](STS1_REFERENCE.md), and [testing](TESTING.md).

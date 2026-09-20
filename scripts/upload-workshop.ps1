@@ -53,7 +53,14 @@ try {
     if ($Visibility -ne 'keep') { $metadata.visibility = $Visibility }
     elseif (!$ItemId) { $metadata.visibility = 'private' }
     else { $null = $metadata.Remove('visibility') }
-    $metadata.changeNote = if ($ChangeNote) { $ChangeNote } else { 'Touch-STS2 ' + (Get-Content TouchSts2.json -Raw | ConvertFrom-Json).version }
+    $version = (Get-Content TouchSts2.json -Raw | ConvertFrom-Json).version
+    if (!$ChangeNote) {
+        $notesPath = Join-Path $source "changelog/$version.bbcode"
+        if (!(Test-Path -LiteralPath $notesPath)) { throw "Add release notes to workshop/changelog/$version.bbcode or pass -ChangeNote." }
+        $ChangeNote = Get-Content -LiteralPath $notesPath -Raw
+    }
+    if ([string]::IsNullOrWhiteSpace($ChangeNote)) { throw 'Workshop change notes must be nonempty.' }
+    $metadata.changeNote = $ChangeNote.Trim()
     $metadata | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $workspace 'workshop.json') -Encoding utf8NoBOM
     if ($ItemId) { Set-Content -LiteralPath (Join-Path $workspace 'mod_id.txt') -Value $ItemId -Encoding utf8NoBOM }
     Write-Host "Workshop workspace: $workspace"

@@ -83,6 +83,7 @@ One pending confirmation uses the game's own confirmation-button scene, animatio
 |---|---|
 | Card rewards and generic card choices | Select, then confirm; preserve skip and the generic screen's opening guard |
 | Generic relic choices | Select, then confirm; preserve native skip rules |
+| Co-op treasure relics | Stage locally, then call native `PickRelic` on confirmation; no vote is sent during preview |
 | Shop cards, relics, potions, removal service | Confirm only affordable choices; recheck stock, price, and gold on submission |
 | Rest-site options | Confirm the option, then enter the native effect or selection screen |
 | Deck removal from shops, events, or relics | Keep native selection, preview, back, and confirmation |

@@ -2,7 +2,11 @@
 
 Release notes describe implementation changes. Offline checks and in-game validation are recorded separately in the [test report](docs/TESTING.md).
 
-## Unreleased
+## 0.2.6 - 2026-09-20
+
+- Require confirmation before submitting a co-op treasure relic vote in touchscreen mode, including chests with only one available relic.
+- Keep unconfirmed choices local and cancel them when the selection becomes invalid or relic distribution begins.
+- Publish versioned bilingual Workshop change notes automatically during uploads; reject missing or empty notes.
 
 - Add English and Chinese settings screenshots to the Workshop gallery after the gameplay demonstrations.
 - Localize the Workshop title and description, document intended touch devices and remote play, and link the public GitHub repository and issue tracker.
