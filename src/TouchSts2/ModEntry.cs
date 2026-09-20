@@ -15,7 +15,7 @@ public static class ModEntry
         {
             TouchSettings.Load();
             GameAdapter.Install();
-            GD.Print("[TouchSts2] 0.2.6 initialized; tested API baseline v0.111.0. Enable Touchscreen Mode in Input Settings.");
+            GD.Print("[TouchSts2] 0.2.7 initialized; tested API baseline v0.111.0. Enable Touchscreen Mode in Input Settings.");
         }
         catch (Exception error)
         {

@@ -2,6 +2,15 @@
 
 Release notes describe implementation changes. Offline checks and in-game validation are recorded separately in the [test report](docs/TESTING.md).
 
+## 0.2.7 - 2026-09-20
+
+- Use the simple card grid's native confirmation button for touchscreen choices, including event rewards and generated-card selections.
+- Confirm ancient gifts before executing the choice; allow holding event options with hover tips to inspect them without selecting on release.
+- Preview Crystal Sphere's affected area before confirmation, rechecking the tool, remaining uses, and hidden cell before spending a use.
+- Keep the Crystal Sphere preview visible while moving to confirm and prevent overlapping submissions during reveal animations.
+- Add 23 engine-free checks for pending confirmation, replacement, cancellation, invalidation, cleanup, and repeated submission.
+- Preserve direct shared-event voting; defer a touchscreen reaction-wheel entry point.
+
 ## 0.2.6 - 2026-09-20
 
 - Require confirmation before submitting a co-op treasure relic vote in touchscreen mode, including chests with only one available relic.

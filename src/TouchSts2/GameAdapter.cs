@@ -17,6 +17,11 @@ using MegaCrit.Sts2.Core.Nodes.Relics;
 using MegaCrit.Sts2.Core.Nodes.Rewards;
 using MegaCrit.Sts2.Core.Nodes.Screens.TreasureRoomRelic;
 using MegaCrit.Sts2.Core.Runs;
+using MegaCrit.Sts2.Core.CardSelection;
+using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Nodes.Events;
+using MegaCrit.Sts2.Core.Nodes.Events.Custom.CrystalSphere;
+using MegaCrit.Sts2.Core.Events.Custom.CrystalSphereEvent;
 
 namespace TouchSts2;
 
@@ -25,6 +30,7 @@ internal static class GameAdapter
 {
     private static readonly Harmony Patches = new("touchsts2.input");
     private static NHandCardHolder? _startingHolder;
+    private static Task _crystalOperation = Task.CompletedTask;
     public static bool Healthy { get; private set; }
 
     private static (MethodInfo Method, string? Prefix, string? Postfix)[] ResolvePatches()
@@ -47,6 +53,12 @@ internal static class GameAdapter
             (typeof(NChooseACardSelectionScreen), "SelectHolder", [typeof(NCardHolder)], nameof(ChoiceCardSelected), null),
             (typeof(NChooseARelicSelection), "SelectHolder", [typeof(NRelicBasicHolder)], nameof(ChoiceRelicSelected), null),
             (typeof(NTreasureRoomRelicCollection), "PickRelic", [typeof(NTreasureRoomRelicHolder)], nameof(TreasureRelicSelected), null),
+            (typeof(NSimpleCardSelectScreen), "CheckIfSelectionComplete", [], nameof(GridAutoSubmit), null),
+            (typeof(NSimpleCardSelectScreen), "OnCardClicked", [typeof(CardModel)], null, nameof(GridCardSelected)),
+            (typeof(NEventOptionButton), "OnRelease", [], nameof(EventSelected), null),
+            (typeof(NCrystalSphereScreen), "OnCellClicked", [typeof(NCrystalSphereCell)], nameof(CrystalCellSelected), null),
+            (typeof(NCrystalSphereScreen), "OnHoverCell", [typeof(NCrystalSphereCell)], nameof(CrystalHover), null),
+            (typeof(NCrystalSphereScreen), "OnUnhoverCell", [typeof(NCrystalSphereCell)], nameof(CrystalHover), null),
             (typeof(NMerchantSlot), "OnSelected", [], nameof(ShopSelected), null),
             (typeof(NRestSiteButton), "SelectOption", [typeof(RestSiteOption)], nameof(RestSelected), null),
             (typeof(NCardHolder), "ClearHoverTips", [], nameof(ClearCardTips), null),
@@ -67,6 +79,17 @@ internal static class GameAdapter
                 throw new MissingFieldException(type.FullName, "_openedTicks");
         if (AccessTools.Field(typeof(NTreasureRoomRelicCollection), "_runState")?.FieldType != typeof(IRunState))
             throw new MissingFieldException(typeof(NTreasureRoomRelicCollection).FullName, "_runState");
+        foreach (var (type, name, fieldType) in new[]
+        {
+            (typeof(NSimpleCardSelectScreen), "_prefs", typeof(CardSelectorPrefs)),
+            (typeof(NSimpleCardSelectScreen), "_selectedCards", typeof(HashSet<CardModel>)),
+            (typeof(NSimpleCardSelectScreen), "_confirmButton", typeof(NConfirmButton)),
+            (typeof(NCrystalSphereScreen), "_entity", typeof(CrystalSphereMinigame))
+        })
+            if (AccessTools.Field(type, name)?.FieldType != fieldType)
+                throw new MissingFieldException(type.FullName, name);
+        if (AccessTools.DeclaredMethod(typeof(NEventOptionButton), "OnFocus", []) == null)
+            throw new MissingMethodException("NEventOptionButton.OnFocus");
         if (AccessTools.Property(typeof(NTargetManager), "HoveredNode")?.PropertyType != typeof(Node))
             throw new MissingMemberException("NTargetManager.HoveredNode");
         if (AccessTools.DeclaredMethod(typeof(NRewardButton), "OnFocus", []) == null)
@@ -74,6 +97,8 @@ internal static class GameAdapter
         foreach (var item in resolved)
         {
             if (item.Method.Name is "IsCardInPlayZone" or "IsCardInCancelZone" && item.Method.ReturnType != typeof(bool))
+                throw new InvalidOperationException($"Unexpected return type: {item.Method}");
+            if (item.Prefix is nameof(ShopSelected) or nameof(RestSelected) or nameof(CrystalCellSelected) && item.Method.ReturnType != typeof(Task))
                 throw new InvalidOperationException($"Unexpected return type: {item.Method}");
         }
         TouchUi.ValidateContract();
@@ -192,6 +217,53 @@ internal static class GameAdapter
         __result = Task.CompletedTask;
         return false;
     }
+
+    // Use the grid's native selection/highlights/button without changing its saved preferences.
+    private static bool GridAutoSubmit() => !TouchRuntime.Active;
+
+    private static void GridCardSelected(CardSelectorPrefs ____prefs, HashSet<CardModel> ____selectedCards,
+        NConfirmButton ____confirmButton)
+    {
+        if (TouchRuntime.Active && ____selectedCards.Count >= ____prefs.MinSelect && ____selectedCards.Count <= ____prefs.MaxSelect)
+            ____confirmButton.Enable();
+    }
+
+    private static bool EventSelected(NEventOptionButton __instance)
+    {
+        var option = __instance.Option;
+        var eventModel = __instance.Event;
+        if (!TouchRuntime.Active || TouchConfirmation.Submitting || eventModel is not AncientEventModel ||
+            eventModel.IsShared || option.IsProceed || option.IsLocked) return true;
+        return !TouchConfirmation.Stage(__instance, () => __instance.Call("OnRelease"),
+            () => TouchConfirmation.Usable(__instance) && __instance.IsEnabled && !option.IsLocked &&
+                ReferenceEquals(option, __instance.Option) && ReferenceEquals(eventModel, __instance.Event));
+    }
+
+    private static bool CrystalCellSelected(NCrystalSphereScreen __instance, NCrystalSphereCell cell,
+        CrystalSphereMinigame ____entity, ref Task __result, MethodBase __originalMethod)
+    {
+        if (!TouchRuntime.Active || TouchConfirmation.Submitting) return true;
+        var entity = ____entity;
+        var target = cell.Entity;
+        var tool = entity.CrystalSphereTool;
+        int remaining = entity.DivinationCount;
+        __result = Task.CompletedTask;
+        if (!_crystalOperation.IsCompleted) return false;
+        if (TouchConfirmation.Stage(cell,
+            () => ObserveTask(_crystalOperation = (Task)__originalMethod.Invoke(__instance, [cell])!),
+            () => TouchConfirmation.Usable(__instance) && TouchConfirmation.Usable(cell) &&
+                _crystalOperation.IsCompleted && target.IsHidden && ReferenceEquals(target, cell.Entity) &&
+                entity.DivinationCount == remaining && remaining > 0 && entity.CrystalSphereTool == tool,
+            entity.UnsetHoveredCell))
+        {
+            if (TouchConfirmation.IsWithin(__instance)) entity.SetHoveredCell(target);
+            return false;
+        }
+        return true;
+    }
+
+    // Keep the staged area visible while the pointer moves to the confirmation button.
+    private static bool CrystalHover(NCrystalSphereScreen __instance) => !TouchConfirmation.IsWithin(__instance);
 
     private static async void ObserveTask(Task task)
     {

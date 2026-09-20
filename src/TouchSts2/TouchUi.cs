@@ -15,6 +15,8 @@ using MegaCrit.Sts2.Core.Nodes.Rewards;
 using MegaCrit.Sts2.Core.Nodes.HoverTips;
 using MegaCrit.Sts2.Core.Rewards;
 using TouchSts2.Interaction;
+using MegaCrit.Sts2.Core.Events;
+using MegaCrit.Sts2.Core.Nodes.Events;
 
 namespace TouchSts2;
 
@@ -37,6 +39,8 @@ internal static class TouchUi
     private static object? _cardModel;
     private static NRewardButton? _reward;
     private static Reward? _rewardModel;
+    private static NEventOptionButton? _eventButton;
+    private static EventOption? _eventOption;
     private static IScreenContext? _context;
     private static Vector2 _start, _last;
     private static bool _replaying;
@@ -89,6 +93,7 @@ internal static class TouchUi
             Control? scroll = null;
             NCardHolder? card = null;
             NRewardButton? reward = null;
+            NEventOptionButton? eventButton = null;
             for (Node? n = hovered; n != null; n = n.GetParent())
             {
                 // Sliders, scrollbars and confirmation buttons keep native press/release ownership.
@@ -96,12 +101,15 @@ internal static class TouchUi
                 if (n is NHandCardHolder) return false;
                 if (n is NCardHolder holder) card = holder;
                 if (n is NRewardButton rewardButton && rewardButton.Reward?.HoverTips.Any() == true) reward = rewardButton;
+                if (n is NEventOptionButton optionButton && !optionButton.Option.IsLocked &&
+                    !optionButton.Option.IsProceed && optionButton.Option.HoverTips.Any()) eventButton = optionButton;
                 if (n is Control c && Fields.Keys.Any(t => t.IsInstanceOfType(n))) { scroll = c; break; }
             }
             if (scroll is NCardGrid grid && !CanScroll(grid)) scroll = null;
-            if (scroll == null && card == null && reward == null) return false;
+            if (scroll == null && card == null && reward == null && eventButton == null) return false;
             _origin = hovered; _scroll = scroll; _card = card; _cardModel = card?.CardModel;
             _reward = reward; _rewardModel = reward?.Reward;
+            _eventButton = eventButton; _eventOption = eventButton?.Option;
             _context = ActiveScreenContext.Instance.GetCurrentScreen();
             _start = _last = mouse.Position;
             var view = NGame.Instance.GetViewport().GetVisibleRect().Size;
@@ -154,7 +162,7 @@ internal static class TouchUi
     private static void TryInspect()
     {
         if (TouchRuntime.Active && NGame.IsGameFocusedWindow() && TouchSettings.LongPressInspect &&
-            Valid() && (_card != null || _reward != null) && _press!.TryHold(Now))
+            Valid() && (_card != null || _reward != null || _eventButton != null) && _press!.TryHold(Now))
         {
             TouchConfirmation.Clear();
             if (_card is { } card)
@@ -174,6 +182,11 @@ internal static class TouchUi
                 NHoverTipSet.Remove(reward);
                 reward.Call("OnFocus");
             }
+            else if (_eventButton is { } eventButton)
+            {
+                NHoverTipSet.Remove(eventButton);
+                eventButton.Call("OnFocus");
+            }
             GD.Print("[TouchSts2] long press: native preview (no selection)");
         }
     }
@@ -182,6 +195,8 @@ internal static class TouchUi
         ReferenceEquals(_context, ActiveScreenContext.Instance.GetCurrentScreen()) &&
         (_card == null || TouchConfirmation.Usable(_card) && ReferenceEquals(_cardModel, _card.CardModel)) &&
         (_reward == null || TouchConfirmation.Usable(_reward) && ReferenceEquals(_rewardModel, _reward.Reward)) &&
+        (_eventButton == null || TouchConfirmation.Usable(_eventButton) && _eventButton.IsEnabled &&
+            !_eventButton.Option.IsLocked && ReferenceEquals(_eventOption, _eventButton.Option)) &&
         (_scroll == null || TouchConfirmation.Usable(_scroll)) && (_scroll is not NCardGrid grid || CanScroll(grid));
 
     private static bool CanScroll(NCardGrid grid) => (bool)_gridCanScroll!.GetValue(grid)!;
@@ -200,6 +215,7 @@ internal static class TouchUi
     {
         _press = null; _origin = null; _scroll = null; _card = null; _cardModel = null;
         _reward = null; _rewardModel = null; _context = null;
+        _eventButton = null; _eventOption = null;
     }
 
     internal static void RegisterMenuButton(NMainMenuTextButton button) => MenuButtons.Add((button, button.CustomMinimumSize));

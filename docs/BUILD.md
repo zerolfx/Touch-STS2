@@ -29,7 +29,7 @@ The **Build and verify** workflow runs on pushes to `main`, `v*` tags, pull requ
 The job:
 
 1. Compiles the mod using the locked reference dependency.
-2. Runs 417 gesture, 102 localization, 28 cursor, and 67 settings adapter checks.
+2. Runs 417 gesture, 102 localization, 28 cursor, 67 settings adapter, and 23 pending confirmation checks.
 3. Creates the versioned installation ZIP.
 4. Inspects the ZIP and its managed DLL without executing the mod.
 5. Checks that deliberately malformed packages are rejected.
@@ -48,7 +48,7 @@ PE metadata is inspected without loading the DLL. The verifier checks assembly i
 
 Negative fixtures cover an extra DLL, duplicate entry, path traversal, missing DLL, substituted manifest, and empty guide. Run those checks after packaging with the repository's `test-package-validation.ps1` script and its `-PackagePath` parameter.
 
-Reference-only CI cannot execute the game's patch-contract reflection checks. Before release, build against the installed game assemblies to resolve the 19 patch targets and associated private fields. The cloud build and a successful contract check still do not replace in-game tests. See [testing](TESTING.md).
+Reference-only CI cannot execute the game's patch-contract reflection checks. Before release, build against the installed game assemblies to resolve the 25 patch targets and associated private fields. The cloud build and a successful contract check still do not replace in-game tests. See [testing](TESTING.md).
 
 ## Steam Workshop release
 

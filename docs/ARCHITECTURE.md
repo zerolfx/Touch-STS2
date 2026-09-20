@@ -6,12 +6,14 @@ This document describes the current implementation against STS2 v0.111.0, releas
 
 Touch-STS2 adds interaction policy while preserving native card validation, selection effects, and action submission. The reference for interaction choices is [STS1 PC's touchscreen mode](STS1_REFERENCE.md). Optional inspection gestures and scroll protection are documented additions.
 
+The [interaction audit](TOUCH_AUDIT.md) records the gaps found in 0.2.6 and their disposition in 0.2.7. Shared-event direct voting is retained; touch access to multiplayer reactions is deferred.
+
 ## Components
 
 | Component | Responsibility |
 |---|---|
 | `ModEntry` | Load settings and install patches once; roll back on initialization failure |
-| `GameAdapter` | Resolve and install 18 version-sensitive patch targets and validate their contracts |
+| `GameAdapter` | Resolve and install 25 version-sensitive patch targets and validate their contracts |
 | `TouchRuntime` | Own combat gestures, coordinate input and native card-play controllers, resolve targets, and clean up |
 | `TouchGesture` | Pure combat gesture and card-position policy in viewport coordinates |
 | `TouchPress` | Pure tap, drag, and hold arbitration for noncombat UI |
@@ -83,6 +85,10 @@ One pending confirmation uses the game's own confirmation-button scene, animatio
 |---|---|
 | Card rewards and generic card choices | Select, then confirm; preserve skip and the generic screen's opening guard |
 | Generic relic choices | Select, then confirm; preserve native skip rules |
+| Simple card grids | Suppress automatic completion during touch input and enable the native confirmation button at valid counts; leave selection preferences unchanged |
+| Ancient gifts | Confirm non-shared, unlocked, non-proceed choices through the original event callback |
+| Event hover tips | Optional hold inspection consumes release; short taps on ordinary/shared event options stay native |
+| Crystal Sphere | Stage a hidden cell and pin native area highlights; revalidate tool/count/cell and serialize confirmed reveals |
 | Co-op treasure relics | Stage locally, then call native `PickRelic` on confirmation; no vote is sent during preview |
 | Shop cards, relics, potions, removal service | Confirm only affordable choices; recheck stock, price, and gold on submission |
 | Rest-site options | Confirm the option, then enter the native effect or selection screen |

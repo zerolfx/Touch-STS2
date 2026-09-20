@@ -3,6 +3,7 @@ using MegaCrit.Sts2.Core.Nodes;
 using MegaCrit.Sts2.Core.Nodes.CommonUi;
 using MegaCrit.Sts2.Core.Nodes.GodotExtensions;
 using MegaCrit.Sts2.Core.Nodes.Screens.ScreenContext;
+using TouchSts2.Interaction;
 
 namespace TouchSts2;
 
@@ -12,20 +13,17 @@ internal static class TouchConfirmation
     private static Control? _selection, _layer;
     private static NConfirmButton? _button;
     private static IScreenContext? _context;
-    private static Action? _submit;
-    private static Func<bool>? _valid;
+    private static readonly PendingConfirmation Choice = new();
     public static bool Submitting { get; private set; }
-    public static bool Pending => _submit != null;
+    public static bool Pending => Choice.Pending;
 
-    public static bool Stage(Control selection, Action submit, Func<bool> valid)
+    public static bool Stage(Control selection, Action submit, Func<bool> valid, Action? cleanup = null)
     {
         if (!TouchRuntime.Active || Submitting) return false;
         Clear();
-        if (!valid()) return true;
+        if (!Choice.Stage(submit, valid, cleanup)) return true;
         _selection = selection;
         _context = ActiveScreenContext.Instance.GetCurrentScreen();
-        _submit = submit;
-        _valid = valid;
         // STS1 keeps Skip/Bowl in their original positions and reveals a separate
         // bottom-right confirm button. Blank-space taps clear the selection.
         // Reuse STS2 visuals, sound and animation; the checkmark needs no new text.
@@ -50,7 +48,7 @@ internal static class TouchConfirmation
     {
         if (!Pending) return;
         if (!TouchRuntime.Active || !NGame.IsGameFocusedWindow() || !Usable(_selection) ||
-            !ReferenceEquals(_context, ActiveScreenContext.Instance.GetCurrentScreen()) || _valid?.Invoke() != true)
+            !ReferenceEquals(_context, ActiveScreenContext.Instance.GetCurrentScreen()) || !Choice.IsValid)
             Clear();
     }
 
@@ -62,9 +60,9 @@ internal static class TouchConfirmation
     private static void Confirm()
     {
         Tick();
-        var action = _submit;
-        if (action == null) return;
+        var action = Choice.Take();
         Clear(); // Clear before invoking: synchronous continuations and double taps cannot resubmit.
+        if (action == null) return;
         Submitting = true;
         try { action(); GD.Print("[TouchSts2] confirmation submitted"); }
         catch (Exception error) { GD.PushError($"[TouchSts2] Confirmation failed: {error}"); }
@@ -73,15 +71,16 @@ internal static class TouchConfirmation
 
     public static void Clear()
     {
-        _submit = null;
-        _valid = null;
         _context = null;
         _selection = null;
         if (GodotObject.IsInstanceValid(_button)) _button!.Disable();
         _button = null;
         if (GodotObject.IsInstanceValid(_layer)) { _layer!.Hide(); _layer.QueueFree(); }
         _layer = null;
+        Choice.Clear();
     }
+
+    internal static bool IsWithin(Control screen) => Pending && Usable(_selection) && screen.IsAncestorOf(_selection!);
 
     internal static bool Usable(Control? node) => GodotObject.IsInstanceValid(node) && !node!.IsQueuedForDeletion() && node.IsVisibleInTree();
     internal static bool Contains(Control? node, Vector2 point) => Usable(node) &&

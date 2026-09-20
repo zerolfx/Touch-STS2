@@ -8,7 +8,7 @@ The recorded game baseline is Windows STS2 v0.111.0, MegaDot 4.5.1-m.14, and .NE
 
 ## Current offline checks
 
-Version 0.2.6 builds in Release with zero warnings and zero errors. The checks cover:
+Version 0.2.7 builds in Release with zero warnings and zero errors. The checks cover:
 
 | Group | Coverage |
 |---|---|
@@ -16,12 +16,15 @@ Version 0.2.6 builds in Release with zero warnings and zero errors. The checks c
 | 102 localization checks | All 16 game languages, nonempty labels, exact locale fixtures, case handling, and fallback |
 | 28 cursor checks | Initial opacity, rotation, pointer following, repeated presses, held fade, release, cleanup, and snap timing at 30/60/144 Hz |
 | 67 settings adapter checks | Registration, all translated labels, preserved preferences, real defaults, two-way synchronization, redundant-write suppression, and BaseLib callback dispatch |
+| 23 pending confirmation checks | Preview has no gameplay side effects; replacement, cancellation, invalidation, cleanup reentrancy, and repeated/failed submission |
 | Optional plugin contracts | Installed BaseLib 3.4.7 and ModConfig 0.2.3 public APIs resolve; the BaseLib adapter type can be generated without starting the engine |
 | Cursor resource | Embedded texture matches the STS1 PC SHA-256 |
-| 19 patch targets | Actual game method signatures and associated mouse, position, scroll, target, reward-preview, and treasure-selection contracts resolve |
+| 25 patch targets | Actual game method signatures and associated mouse, position, scroll, target, reward-preview, treasure, simple-grid, event, and Crystal Sphere contracts resolve |
 | Embedded localization | Release DLL contains all 16 language tables |
 
 The 0.2.6 treasure fix reuses the existing confirmation lifecycle. Source inspection verifies that staging does not call the native vote method, and the added patch and private fields resolve against the installed game. This is not a live multiplayer result.
+
+The 0.2.7 event changes have source/API checks and engine-free confirmation lifecycle tests only. The latter simulate validity changes; they do not execute Godot controls, card-grid callbacks, or Crystal Sphere animations. In-game acceptance must cover fixed and variable card counts, revising choices, ancient gifts, event holds with the setting on/off, and Crystal Sphere area preview, tool changes, cancellation, duplicate release callbacks, reveal timing, and final-use completion. Verify ordinary shared-event short taps still vote directly.
 
 The co-op policy tests receive target validity as an input. They do not prove real friend/enemy classification or synchronization in a multiplayer room. Native validation calls and source inspection support the implementation, but a real session remains necessary.
 
@@ -31,7 +34,7 @@ The cursor tests establish resource identity and fade-state behavior. They do no
 
 GitHub Actions builds the managed DLL on one Ubuntu runner using a pinned, locked compile-only reference package. The job runs the pure checks and inspects the final ZIP's allowlist, manifest, assembly identity/version, embedded translations, and cursor hash. Six malformed-package fixtures verify rejection of unexpected payloads and missing or changed files. Each successful build uploads the installation ZIP, a checksum, and a per-file verification report.
 
-The 19 runtime patch-contract checks require actual installed game assemblies and remain part of the installed-game build. Reference-only CI reports this distinction explicitly. The cloud job does not start the game. See [build and release](BUILD.md) for commands and artifact details.
+The 25 runtime patch-contract checks require actual installed game assemblies and remain part of the installed-game build. Reference-only CI reports this distinction explicitly. The cloud job does not start the game. See [build and release](BUILD.md) for commands and artifact details.
 
 The Workshop script's dry run verifies the package again and stages the bilingual metadata, flat install payload, cover, three ordered GIFs, and English/Chinese settings screenshots. All previews and the cover are checked against the uploader's 1 MB limit. The official uploader has successfully created and updated the Workshop item. Dry runs never contact Steam. Versioned bilingual change notes are required unless explicitly overridden.
 

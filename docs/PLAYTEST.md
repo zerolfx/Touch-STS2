@@ -28,6 +28,12 @@ Card rewards, generic card/relic choices, shop purchases, removal services, and 
 
 Co-op treasure chests also require confirmation, even when only one relic is available. Tapping a relic previews it locally; only the confirmation button submits your vote to the party. You can change your choice before confirming. Unconfirmed choices are canceled when the screen closes or relic distribution starts.
 
+Simple card grids, including event rewards and generated-card choices, use their existing confirmation button in touchscreen mode. Select the required number of cards, adjust the selection if needed, then confirm.
+
+Ancient gifts require confirmation. With **Hold to inspect** enabled, holding an event option with native hover tips shows its information without selecting it on release. Shared-event short taps retain native direct voting.
+
+In Crystal Sphere, tap a hidden cell to preview the selected tool's affected area, then confirm to spend a use. Tapping elsewhere cancels; changing tools requires selecting a cell again. The next choice becomes available after the reveal finishes.
+
 Deck removal, upgrade, transform, enchantment, and bundle selection keep their existing native preview and confirmation screens. This includes removal initiated by events and relics, not just shops. Selection counts, mandatory choices, and effect-specific confirmation rules remain native.
 
 Drag lists from their entries to scroll. Once the drag threshold is crossed, that gesture cannot also select an item, even if the pointer returns to its starting point. The timeline scrolls horizontally. Map scrolling and node selection keep their native rules.
@@ -42,7 +48,7 @@ Touch feedback uses STS1 PC's original orb texture and fade formula. It fades ev
 
 ## Compatibility
 
-The implementation targets STS2 v0.111.0. User acceptance was completed on September 20, 2026, with recordings demonstrating combat, reward selection, and shop confirmation. The recordings do not identify the input hardware. The co-op treasure confirmation added in 0.2.6 has been checked against the game API but still needs a live multiplayer test.
+The implementation targets STS2 v0.111.0. User acceptance was completed on September 20, 2026, with recordings demonstrating combat, reward selection, and shop confirmation. The recordings do not identify the input hardware. The co-op treasure confirmation added in 0.2.6 and event interactions added in 0.2.7 have offline checks but still need in-game acceptance.
 
 Physical touch, Windows long-press promotion, multiple fingers, Steam Deck/gamescope, controller hardware, and multiplayer require further device testing. See [testing](TESTING.md) for exact evidence and the manual checklist.
 
