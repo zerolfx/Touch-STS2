@@ -294,7 +294,6 @@ foreach (var (fps, frames) in new[] { (30, 41), (60, 83), (144, 202) })
     Equal(0f, cursor.Alpha, "repeated held event does not revive faded cursor");
 }
 Console.WriteLine($"PASS: {checks - cursorChecks} STS1 cursor checks at 30/60/144 Hz.");
-Console.WriteLine($"PASS: {SettingsAdapterChecks.Run()} optional settings adapter checks.");
 ConfirmationChecks.Run(Equal);
 
 if (args.Length >= 2)

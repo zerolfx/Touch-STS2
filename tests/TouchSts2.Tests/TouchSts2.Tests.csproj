@@ -8,7 +8,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="../../src/TouchSts2/Interaction/PendingConfirmation.cs" Link="PendingConfirmation.cs" />
-    <Compile Include="../../src/TouchSts2/OptionalConfigAdapters.cs" Link="OptionalConfigAdapters.cs" />
+    <Compile Include="../../src/TouchSts2/RitsuSettingsAdapter.cs" Link="RitsuSettingsAdapter.cs" />
     <Compile Include="../../src/TouchSts2/Interaction/TouchCursorFeedback.cs" Link="TouchCursorFeedback.cs" />
     <Compile Include="../../src/TouchSts2/Localization/TouchText.cs" Link="TouchText.cs" />
     <EmbeddedResource Include="../../src/TouchSts2/Localization/strings.json" LogicalName="TouchSts2.Localization.strings.json" />

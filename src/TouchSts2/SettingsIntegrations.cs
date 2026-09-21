@@ -1,4 +1,6 @@
 using Godot;
+using MegaCrit.Sts2.Core.Localization;
+using TouchSts2.Localization;
 
 namespace TouchSts2;
 
@@ -7,36 +9,18 @@ internal static class SettingsIntegrations
     // Called on the first game frame, after all mod initializers have run.
     internal static void Initialize()
     {
-        void Register(string typeName, Action<Type> register)
+        var registry = AppDomain.CurrentDomain.GetAssemblies()
+            .Select(a => a.GetType("STS2RitsuLib.Settings.ModSettingsRegistry")).FirstOrDefault(t => t != null);
+        if (registry == null) return;
+        try
         {
-            var type = AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetType(typeName)).FirstOrDefault(t => t != null);
-            if (type == null) return;
-            try
-            {
-                register(type);
-                GD.Print($"[TouchSts2] Settings registered with {type.Assembly.GetName().Name}");
-            }
-            catch (Exception error)
-            {
-                GD.PushWarning($"[TouchSts2] Optional settings integration failed: {typeName}: {error.GetBaseException().Message}");
-            }
+            RitsuSettingsAdapter.Register(registry, TouchSettings.Options,
+                key => TouchText.Get(LocManager.Instance.Language, key));
+            GD.Print("[TouchSts2] Settings registered with RitsuLib Mod Settings");
         }
-        Register("ModConfig.ModConfigApi", api =>
+        catch (Exception error)
         {
-            var sync = OptionalConfigAdapters.RegisterModConfig(api, TouchSettings.Options);
-            TouchSettings.Changed += () =>
-            {
-                try { sync(); }
-                catch (Exception error) { GD.PushWarning($"[TouchSts2] ModConfig sync failed: {error.GetBaseException().Message}"); }
-            };
-        });
-        Register("BaseLib.Config.ModConfig", configType =>
-        {
-            var config = OptionalConfigAdapters.CreateBaseLibConfig(configType,
-                (Action<Control>)(container => SettingsUi.AddOptions(container)),
-                () => { foreach (var option in TouchSettings.Options) option.Set(option.Default); });
-            configType.Assembly.GetType("BaseLib.Config.ModConfigRegistry", true)!
-                .GetMethod("Register", [typeof(string), configType])!.Invoke(null, ["TouchSts2", config]);
-        });
+            GD.PushWarning($"[TouchSts2] RitsuLib settings integration failed: {error.GetBaseException().Message}");
+        }
     }
 }

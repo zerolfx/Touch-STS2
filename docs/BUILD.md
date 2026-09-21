@@ -29,7 +29,7 @@ The **Build and verify** workflow runs on pushes to `main`, `v*` tags, pull requ
 The job:
 
 1. Compiles the mod using the locked reference dependency.
-2. Runs 417 gesture, 102 localization, 28 cursor, 67 settings adapter, and 23 pending confirmation checks.
+2. Runs 417 gesture, 102 localization, 28 cursor, and 23 pending confirmation checks. Installed RitsuLib binding checks are run locally with the optional plugin assemblies.
 3. Creates the versioned installation ZIP.
 4. Inspects the ZIP and its managed DLL without executing the mod.
 5. Checks that deliberately malformed packages are rejected.

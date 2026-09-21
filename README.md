@@ -11,7 +11,7 @@ STS1-style touchscreen controls for Slay the Spire 2.
 
 Enable **Touchscreen mode** in the game's input settings. Mouse input follows the same rules while it is enabled; controller input temporarily takes over. **Hold to inspect** and **Touch feedback** can be toggled separately.
 
-The same settings are available through BaseLib and ModConfig when installed. See the [player guide](docs/PLAYTEST.md) for controls and compatibility.
+The same settings are available in RitsuLib's Mod Settings when installed. See the [player guide](docs/PLAYTEST.md) for controls and compatibility.
 
 Drag cards and choose targets in combat.
 

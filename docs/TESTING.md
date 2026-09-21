@@ -8,16 +8,16 @@ The recorded game baseline is Windows STS2 v0.111.0, MegaDot 4.5.1-m.14, and .NE
 
 ## Current offline checks
 
-Version 0.2.8 builds in Release with zero warnings and zero errors. The checks cover:
+Version 0.2.9 builds in Release with zero warnings and zero errors. The checks cover:
 
 | Group | Coverage |
 |---|---|
 | 417 gesture checks | Four viewport sizes; release policy, cancellation, card switching, positioning, drag/hold arbitration, and legal-target inputs outside the ordinary play area |
 | 102 localization checks | All 16 game languages, nonempty labels, exact locale fixtures, case handling, and fallback |
 | 28 cursor checks | Initial opacity, rotation, pointer following, repeated presses, held fade, release, cleanup, and snap timing at 30/60/144 Hz |
-| 67 settings adapter checks | Registration, all translated labels, preserved preferences, real defaults, two-way synchronization, redundant-write suppression, and BaseLib callback dispatch |
+| 73 installed RitsuLib checks | Actual page registration, 16-language labels, preserved preferences, live reads/writes, default resets, no duplicate save, and page replacement |
 | 23 pending confirmation checks | Preview has no gameplay side effects; replacement, cancellation, invalidation, cleanup reentrancy, and repeated/failed submission |
-| Optional plugin contracts | Installed BaseLib 3.4.7 and ModConfig 0.2.3 public APIs resolve; the BaseLib adapter type can be generated without starting the engine |
+| Optional settings integration | Installed RitsuLib public APIs execute without starting Godot; absence of the plugin leaves native settings available |
 | Cursor resource | Embedded texture matches the STS1 PC SHA-256 |
 | 25 patch targets | Actual game method signatures and associated mouse, position, scroll, target, reward-preview, treasure, simple-grid, event, and Crystal Sphere contracts resolve |
 | Embedded localization | Release DLL contains all 16 language tables |
@@ -29,6 +29,10 @@ The 0.2.7 event changes have source/API checks and engine-free confirmation life
 The co-op policy tests receive target validity as an input. They do not prove real friend/enemy classification or synchronization in a multiplayer room. Native validation calls and source inspection support the implementation, but a real session remains necessary.
 
 The cursor tests establish resource identity and fade-state behavior. They do not establish cross-engine pixel equivalence or identical visibility in every STS1 state; see [the STS1 reference](STS1_REFERENCE.md).
+
+## Optional settings integration
+
+The 0.2.9 integration replaces both older configuration adapters with RitsuLib's public settings API. The 73 local binding checks execute the installed settings assembly, not a mocked API. They do not render its menu. Check that Touch-STS2 appears under Mod Settings after restarting, that it no longer registers with ModConfig or BaseLib, and that native and plugin settings agree. These local checks require the Workshop content directory as the test executable's third argument; CI runs the remaining 570 pure checks without optional plugin assemblies.
 
 ## Hover handoff regression
 

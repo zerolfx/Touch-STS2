@@ -10,6 +10,7 @@ using MegaCrit.Sts2.Core.Nodes.CommonUi;
 using MegaCrit.Sts2.Core.Nodes.Rooms;
 using MegaCrit.Sts2.Core.Nodes.Screens;
 using MegaCrit.Sts2.Core.Nodes.Screens.Capstones;
+using MegaCrit.Sts2.Core.Nodes.Screens.MainMenu;
 using MegaCrit.Sts2.Core.Nodes.Screens.PauseMenu;
 using MegaCrit.Sts2.Core.Nodes.Screens.ScreenContext;
 using MegaCrit.Sts2.Core.Nodes.Screens.Settings;
@@ -49,11 +50,13 @@ internal static class TouchRuntime
         {
             if (NGame.Instance?.MainMenu is { } menu)
                 return menu.PatchNotesScreen?.IsOpen != true &&
-                    menu.SubmenuStack?.Peek() is null or NSettingsScreen;
+                    (menu.SubmenuStack?.Peek() is not { } submenu || IsSettingsPage(submenu));
             return NCapstoneContainer.Instance?.CurrentCapstoneScreen is NCapstoneSubmenuStack stack &&
-                stack.Stack.Peek() is NPauseMenu or NSettingsScreen;
+                IsSettingsPage(stack.Stack.Peek());
         }
     }
+    private static bool IsSettingsPage(NSubmenu? submenu) => submenu is NPauseMenu or NSettingsScreen ||
+        submenu?.GetType().FullName == "STS2RitsuLib.Settings.RitsuModSettingsSubmenu";
     public static bool HasCard => _play != null && GodotObject.IsInstanceValid(_play) && !_play.IsQueuedForDeletion();
     public static bool CommitRequested { get; private set; }
     public static bool Submitting { get; private set; }

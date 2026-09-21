@@ -2,6 +2,13 @@
 
 Release notes describe implementation changes. Offline checks and in-game validation are recorded separately in the [test report](docs/TESTING.md).
 
+## 0.2.9 - 2026-09-21
+
+- Register the three options with RitsuLib's Mod Settings, replacing the BaseLib and ModConfig integrations.
+- Preserve saved preferences and localized labels, with native and plugin settings sharing one configuration store.
+- Keep the native cursor visible in RitsuLib's settings page.
+- Lead the Workshop description with the manual activation requirement and the game's native settings path.
+
 ## 0.2.8 - 2026-09-21
 
 - Keep the native cursor on the main-menu home page, pause menu, and settings so touch mode can be disabled with a mouse. Other menu subpages retain touch behavior; opening the pause menu does not move the pointer away.

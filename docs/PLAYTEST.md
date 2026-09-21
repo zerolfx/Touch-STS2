@@ -8,11 +8,11 @@ Accept the game's initial mod-loading warning with a mouse or controller. Enabli
 
 Input settings provide **Touchscreen mode**, **Hold to inspect**, and **Touch feedback**, translated into the current game language. Touchscreen mode defaults to off and changes immediately. The two optional aids default to on. Preferences are stored in `TouchSts2.cfg` and apply across save slots.
 
-When BaseLib or ModConfig is installed, its configuration tab also lists Touch-STS2. All entry points share these preferences; neither plugin is required. Restart after updating the mod to load the new settings integration.
+When RitsuLib is installed, its Mod Settings page also lists Touch-STS2. Both entry points share these preferences; RitsuLib is optional. Restart after updating the mod to load the new settings integration.
 
 While enabled, mouse input follows the same rules as touch input. Mouse movement does not disable the preference. Controller input temporarily suspends it; clicking restores it. This also supports platforms that expose touches only as mouse events.
 
-The main-menu home page, Esc pause menu, and settings keep the native mouse cursor so you can easily turn touchscreen mode off. Other pages, including multiplayer lobbies, the compendium, and run history, retain touch behavior. Controller navigation retains the game's normal cursor behavior.
+The main-menu home page, Esc pause menu, and settings (including RitsuLib's Mod Settings) keep the native mouse cursor so you can easily turn touchscreen mode off. Other pages, including multiplayer lobbies, the compendium, and run history, retain touch behavior. Controller navigation retains the game's normal cursor behavior.
 
 ## Combat
 

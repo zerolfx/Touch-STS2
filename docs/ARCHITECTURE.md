@@ -21,12 +21,12 @@ The [interaction audit](TOUCH_AUDIT.md) records the gaps found in 0.2.6 and thei
 | `TouchConfirmation` | Keep one pending choice and present a native confirmation button |
 | `TouchCursor` / `TouchCursorFeedback` | Render one touch orb and apply the STS1 fade state |
 | `TouchSettings` / `SettingsUi` | Persist preferences and add translated settings with native fonts |
-| `SettingsIntegrations` / `OptionalConfigAdapters` | Register with optional configuration plugins after mod initialization and synchronize preferences |
+| `SettingsIntegrations` / `RitsuSettingsAdapter` | Register an optional RitsuLib settings page with live bindings to canonical preferences |
 | `TouchText` | Resolve embedded translations with English fallback |
 
 ## Input and coordinates
 
-Input settings and BaseLib share the same native tickbox rows. Fixed 28-point labels avoid shrinking while the container has its initial zero-sized layout. ModConfig receives translated toggle entries through its public API. Changes propagate through the canonical settings store with equality guards; installing a configuration plugin preserves existing preferences. The BaseLib adapter is generated only when BaseLib is loaded, so neither configuration framework becomes a mandatory assembly dependency.
+Native input settings use fixed 28-point labels to avoid shrinking during initial layout. RitsuLib's Mod Settings receives three toggles through its public page and callback-binding APIs. Labels resolve in the current game language; reads, writes, and resets use the canonical preferences. Reflection keeps RitsuLib optional. BaseLib and ModConfig registrations were removed in 0.2.9.
 
 The inspected game has no dedicated screen-touch gesture implementation. Touch-STS2 uses the primary touch-to-mouse path and stays in `MouseAndKeyboard` mode. Controller and keyboard-only navigation disable recursive mouse handling in the native UI, so they cannot be used as a substitute touch mode.
 
