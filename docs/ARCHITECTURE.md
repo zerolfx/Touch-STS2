@@ -34,7 +34,9 @@ The project's design resolution is 1920 by 1080 with `canvas_items` stretching a
 
 Input is observed through `NGame` and `NControllerManager` before GUI handling. Event instance IDs prevent one event from being processed twice through different patched entry points. Godot's emulated mouse stream is the command path; raw touch events provide cancellation tracking. Internal click replay and pointer parking do not restart touch feedback.
 
-The user preference does not change on mouse motion. Explicit controller input suspends touch behavior; a left or right mouse press restores it. An analog magnitude above 0.5 counts as controller input.
+The user preference does not change on mouse motion. Explicit controller input suspends touch behavior; a left or right mouse press restores it. An analog magnitude above 0.5 counts as controller input. While a pointer is held or its release is pending, `TouchInputOwnership` consumes controller events before native mode detection. They are discarded, not replayed later. After completion, a fresh controller event can take over normally. Focus loss and touch cancellation release the pointer state.
+
+Combat pointer parking still requests the usual neutral cursor position, but `TouchHover` also clears the viewport's native hover through its exit/entry notifications. This clears internal hover and emits native exit notifications even when the OS cursor has not moved. The next pointer event can hover normally; cleanup does not synthesize a click or change focus.
 
 Native action input uses `InputEventAction` and `MegaInput` rather than ordinary Godot InputMap bindings. The mod reuses that path where needed, including switching selected cards. It does not introduce another game input-mode enum value.
 

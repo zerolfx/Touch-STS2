@@ -33,8 +33,9 @@ The job:
 3. Creates the versioned installation ZIP.
 4. Inspects the ZIP and its managed DLL without executing the mod.
 5. Checks that deliberately malformed packages are rejected.
-6. Stages the bilingual Workshop description and versioned change notes, cover, three GIFs, and two settings screenshots in dry-run mode without contacting Steam.
-7. Uploads the verified ZIP, its SHA-256 checksum, and a JSON verification report for 14 days.
+6. Runs simulated input and hover checks in a checksum-pinned Linux Godot .NET 4.5.1 engine, using the same hover and input-ownership source files as the mod.
+7. Stages the bilingual Workshop description and versioned change notes, cover, three GIFs, and two settings screenshots in dry-run mode without contacting Steam.
+8. Uploads the verified ZIP, its SHA-256 checksum, and a JSON verification report for 14 days.
 
 Download artifacts from the workflow run's summary. The outer Actions download contains the versioned installation ZIP and its two verification files. The installation ZIP contains only the mod DLL, matching manifest, and player guide inside a single mod folder.
 

@@ -45,6 +45,8 @@ internal static class TouchUi
     private static Vector2 _start, _last;
     private static bool _replaying;
     internal static bool IsReplaying => _replaying;
+    private static int _pendingTaps;
+    internal static bool ReplayPending => _pendingTaps > 0;
     private static bool _consumeRelease;
     private static PropertyInfo? _gridCanScroll;
     private static readonly List<(NMainMenuTextButton Button, Vector2 Minimum)> MenuButtons = new();
@@ -131,13 +133,14 @@ internal static class TouchUi
         _consumeRelease = false;
         if (tap)
         {
+            _pendingTaps++;
             // Defer so the captured release cannot also reach the newly opened screen.
             Callable.From(() =>
             {
-                if (!TouchRuntime.Active || !TouchConfirmation.Usable(origin) || !ReferenceEquals(context, ActiveScreenContext.Instance.GetCurrentScreen())) return;
-                _replaying = true;
                 try
                 {
+                    if (!TouchRuntime.Active || !TouchConfirmation.Usable(origin) || !ReferenceEquals(context, ActiveScreenContext.Instance.GetCurrentScreen())) return;
+                    _replaying = true;
                     var viewport = NGame.Instance!.GetViewport();
                     using var down = new InputEventMouseButton { ButtonIndex = MouseButton.Left, Pressed = true, Position = start, GlobalPosition = start };
                     using var up = new InputEventMouseButton { ButtonIndex = MouseButton.Left, Pressed = false, Position = end, GlobalPosition = end };
@@ -148,7 +151,7 @@ internal static class TouchUi
                     using var hover = new InputEventMouseMotion { Position = end, GlobalPosition = end };
                     viewport.PushInput(hover, true);
                 }
-                finally { _replaying = false; }
+                finally { _replaying = false; _pendingTaps--; }
             }).CallDeferred();
         }
         return true;

@@ -40,6 +40,16 @@ jobs:
         run: |
           $version = (Get-Content TouchSts2.json -Raw | ConvertFrom-Json).version
           ./scripts/test-package-validation.ps1 -PackagePath "dist/TouchSts2-$version.zip"
+      - name: Simulate input in the Linux Godot engine
+        run: |
+          $archive = Join-Path $env:RUNNER_TEMP 'godot.zip'
+          Invoke-WebRequest 'https://github.com/godotengine/godot/releases/download/4.5.1-stable/Godot_v4.5.1-stable_mono_linux_x86_64.zip' -OutFile $archive
+          if ((Get-FileHash $archive -Algorithm SHA256).Hash -ne 'B61697DD6921DA76E3D2358AB592263DFAAE398D0AC1229E82EAB7E4A7C36CBF') { throw 'Godot checksum mismatch.' }
+          $directory = Join-Path $env:RUNNER_TEMP 'godot'
+          Expand-Archive $archive $directory
+          $engine = Join-Path $directory 'Godot_v4.5.1-stable_mono_linux_x86_64/Godot_v4.5.1-stable_mono_linux.x86_64'
+          & chmod +x $engine
+          ./scripts/test-engine.ps1 -EnginePath $engine
       - name: Validate Workshop metadata and stage previews without uploading
         run: |
           $version = (Get-Content TouchSts2.json -Raw | ConvertFrom-Json).version

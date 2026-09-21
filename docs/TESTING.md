@@ -8,7 +8,7 @@ The recorded game baseline is Windows STS2 v0.111.0, MegaDot 4.5.1-m.14, and .NE
 
 ## Current offline checks
 
-Version 0.2.9 builds in Release with zero warnings and zero errors. The checks cover:
+Version 0.2.10 builds in Release with zero warnings and zero errors. The checks cover:
 
 | Group | Coverage |
 |---|---|
@@ -33,6 +33,38 @@ The cursor tests establish resource identity and fade-state behavior. They do no
 ## Optional settings integration
 
 The 0.2.9 integration replaces both older configuration adapters with RitsuLib's public settings API. The 73 local binding checks execute the installed settings assembly, not a mocked API. They do not render its menu. Check that Touch-STS2 appears under Mod Settings after restarting, that it no longer registers with ModConfig or BaseLib, and that native and plugin settings agree. These local checks require the Workshop content directory as the test executable's third argument; CI runs the remaining 570 pure checks without optional plugin assemblies.
+
+## 0.2.10 platform simulation
+
+The engine test project links the production `TouchInputOwnership`, `TouchHover`, and card gesture policy directly. It injects real Godot mouse, touch, drag, cancellation, and joypad events. This verifies the shared helpers and engine dispatch, not the full game's patched input order or a physical touchscreen.
+
+Recorded on Godot .NET 4.5.1:
+
+| Environment | Result |
+|---|---|
+| Windows, headless | 31 checks passed |
+| Windows, native window / OpenGL | 37 checks passed |
+| Ubuntu 24.04 under WSL 2, headless | 31 checks passed |
+| WSLg X11, Mesa llvmpipe | 37 checks passed |
+| WSLg Wayland, Mesa llvmpipe | 37 assertions passed, but the final run did not exit cleanly; not counted as a complete pass |
+| Linux .NET 9 | All 570 pure checks passed |
+
+An isolated Windows STS2 v0.111.0 startup with Steam disabled loaded 0.2.10 and installed all 25 patches on MegaDot 4.5.1-m.14. This was a headless initialization check, not a new full gameplay acceptance run. Native task/shutdown diagnostics were present; the mod did not report an initialization or runtime failure.
+
+The native-window regression first keeps the OS pointer over a control and sends only a synthetic motion elsewhere. The old fallback leaves the original hover active. Calling the production cleanup clears both the control's hover state and its tooltip without moving the OS pointer; a subsequent input restores normal hover and clicking. This reproduces a conditional, cross-platform fallback defect. It does not establish that a Steam Deck running STS2 actually ignores the original warp request.
+
+Input checks cover a held drag, delayed release, controller press/release and stick movement, fresh controller takeover after completion, return to touch, touch mode disabled, two fingers, canceled touch, and focus-loss state cleanup. Targeted and untargeted card policies still commit once after controller interference. Raw touch with mouse emulation disabled intentionally produces no mouse commands; direct touch-only gameplay remains unsupported rather than silently enabling another input stream.
+
+The local WSL Vulkan device exposes only software rendering and lacks `VK_KHR_external_semaphore_fd`, which the inspected Gamescope 3.16.1 code requires. The distribution also has no Gamescope package candidate. Gamescope was not run. Linux STS2, the game's Linux engine fork, SteamOS, Steam Input device translation, and physical Steam Deck interaction were not tested. Do not describe this as Steam Deck certification or a hardware regression fix.
+
+Run with an official Godot .NET 4.5.1 executable:
+
+```powershell
+./scripts/test-engine.ps1 -EnginePath $engine
+./scripts/test-engine.ps1 -EnginePath $engine -Graphical
+```
+
+Linux graphical runs can select `-DisplayDriver x11` or `-DisplayDriver wayland`. Run graphical tests serially because their windows share focus and the OS pointer. CI uses only the headless suite in the existing Ubuntu job.
 
 ## Hover handoff regression
 
@@ -158,7 +190,7 @@ Native confirmation scenes, settings font updates, shared removal flows, party-s
 - **Steam Deck/gamescope:** record the actual display backend, event types, mouse-emulation setting, and pointer-warp result. A touch may arrive solely as a mouse event; device `-1` cannot be required universally.
 - **Engine fork:** upstream Godot behavior is evidence, not proof of MegaDot's exact dispatch order. Observe the shipped engine rather than assuming every upstream detail is unchanged.
 - **Early card pickup:** newly drawn holders temporarily disable their hitboxes during animation. Measure whether fast first taps are lost before considering input buffering.
-- **Pointer cleanup:** verify neutral synthetic motion clears hover even if the platform ignores the hardware warp, including after overlays appear.
+- **Pointer cleanup:** the conditional warp-failure case is covered by the 0.2.10 simulation above. Verify the same cleanup in actual game scenes and after overlays appear on physical hardware.
 - **Multiplayer:** test host and client submission, party-sidebar targets, disconnects, and action completion timing. For treasure chests, have every other player vote first: tapping or changing a relic must not send a vote or start distribution; pressing confirm must submit exactly once. Repeat with a single available relic, cancel by tapping blank space or Escape, leave and reopen the screen, and verify invalidated choices cannot submit. Check native single-player, controller, and touch-disabled behavior.
 - **Continuous holds:** validate the 0.55-second inspector with physical input and slow frames, including release after the threshold and dragging away.
 - **Native UI details:** check dropdowns, credits, timeline scrolling, transform selection, and context cleanup on the real device. Existing source coverage should not be reported as a runtime pass.

@@ -27,7 +27,10 @@ internal static class TouchRuntime
     private static Vector2 _switchPress;
     private static Vector2? _switchRelease;
     private static ulong _lastEvent;
-    private static bool _lastConsumed, _controllerSuspended, _pointerDown, _parkPending, _initialized;
+    private static bool _lastConsumed, _parkPending, _initialized;
+    private static readonly TouchInputOwnership InputOwnership = new();
+    private static bool _controllerSuspended { get => InputOwnership.ControllerSuspended; set => InputOwnership.ControllerSuspended = value; }
+    private static bool _pointerDown { get => InputOwnership.PointerDown; set => InputOwnership.PointerDown = value; }
     private static Vector2 _pointer;
     private static float _inspectX;
     private static Rect2 _originalCardRect;
@@ -111,6 +114,16 @@ internal static class TouchRuntime
     private static bool ObserveCore(InputEvent input)
     {
         Probe(input);
+        bool wasDown = _pointerDown;
+        bool wasSuspended = _controllerSuspended;
+        if (InputOwnership.Observe(input, TouchSettings.Enabled,
+            _release != null || _switchRelease != null || TouchUi.ReplayPending)) return true;
+        if (!wasSuspended && _controllerSuspended)
+        {
+            TouchUi.Reset();
+            TouchConfirmation.Clear();
+            Cancel("controller input");
+        }
         if (input is InputEventScreenTouch touch)
         {
             if (touch.Pressed) _primaryTouch ??= touch.Index;
@@ -136,15 +149,6 @@ internal static class TouchRuntime
         {
             _release = null;
             if (Owns(pending.Play) && HasCard) Release(pending.Position);
-        }
-        if (input is InputEventJoypadButton { Pressed: true } ||
-            input is InputEventJoypadMotion axis && Math.Abs(axis.AxisValue) > 0.5f)
-        {
-            _controllerSuspended = true;
-            TouchUi.Reset();
-            TouchConfirmation.Clear();
-            Cancel("controller input");
-            return false;
         }
         if (input is InputEventMouseMotion motion)
         {
@@ -172,7 +176,7 @@ internal static class TouchRuntime
             return true;
         }
         if (mouse.ButtonIndex != MouseButton.Left) return false;
-        bool repeatedDown = mouse.Pressed && _pointerDown;
+        bool repeatedDown = mouse.Pressed && wasDown;
         _pointerDown = mouse.Pressed;
         if (!TouchUi.IsReplaying) TouchCursor.Button(mouse.Pressed, mouse.Position);
         if (!HasCard && _switchTo == null && TouchUi.Observe(input)) return true;
@@ -460,10 +464,11 @@ internal static class TouchRuntime
         _injected = true;
         try
         {
-            // Synthetic motion clears Godot hover even if gamescope refuses the warp.
+            // Keep the usual pointer position when supported, but do not depend on it.
             NGame.Instance!.GetViewport().WarpMouse(neutral);
             using var motion = new InputEventMouseMotion { Position = neutral, GlobalPosition = neutral, Device = -1 };
             NGame.Instance.GetViewport().PushInput(motion, true);
+            TouchHover.Clear(NGame.Instance.GetViewport());
         }
         finally { _injected = false; }
         Log($"park requested={neutral}; actual={NGame.Instance!.GetViewport().GetMousePosition()}");

@@ -2,6 +2,13 @@
 
 Release notes describe implementation changes. Offline checks and in-game validation are recorded separately in the [test report](docs/TESTING.md).
 
+## 0.2.10 - 2026-09-22
+
+- Clear native hover explicitly after combat pointer parking, including when the display backend ignores cursor warping.
+- Keep held pointer gestures and deferred releases from being interrupted by controller input; discard those controller events instead of replaying them later.
+- Add shared-code Godot input and hover regressions on Windows and Linux, with headless engine checks in the existing Ubuntu CI job.
+- Explain the Windows testing and lack of Steam Deck hardware testing in the Workshop description, and invite player feedback.
+
 ## 0.2.9 - 2026-09-21
 
 - Register the three options with RitsuLib's Mod Settings, replacing the BaseLib and ModConfig integrations.

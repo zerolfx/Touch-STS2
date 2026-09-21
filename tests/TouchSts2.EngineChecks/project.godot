@@ -1,0 +1,15 @@
+config_version=5
+
+[application]
+config/name="Touch-STS2 Input Checks"
+run/main_scene="res://Checks.tscn"
+
+[display]
+window/size/viewport_width=1280
+window/size/viewport_height=800
+
+[dotnet]
+project/assembly_name="TouchSts2.EngineChecks"
+
+[rendering]
+renderer/rendering_method="gl_compatibility"
